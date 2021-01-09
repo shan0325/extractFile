@@ -9,6 +9,9 @@ import java.io.*;
 
 public class ExtractMain extends JFrame {
 
+    private static final String VERSION = "1.0.0";
+
+    private JLabel versionLabel;
     private JFileChooser rootDirCs;
     private JFileChooser targetDirCs;
     private JFileChooser fileListCs;
@@ -19,16 +22,22 @@ public class ExtractMain extends JFrame {
     private JTextArea jta;
     private JScrollPane jsp;
 
+    private ExtractTemplate extractTemplate;
+
     
     public ExtractMain() {
         super("파일 추출기");
         init();
         eventInit();
+
+        extractTemplate = new ReaderExtract();
     }
 
     private void init() {
-        String defaultJfcPath = "C:\\Users\\" + System.getenv("USERNAME") + "\\Desktop";
+        String defaultJfcPath = System.getProperty("user.home") + "\\Desktop";
         String rootJfcPath = "D:\\";
+
+
 
         rootDirBtn = new JButton("소스루트");
         targetDirBtn = new JButton("추출경로");
@@ -69,12 +78,19 @@ public class ExtractMain extends JFrame {
         panel3.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         panel3.add(jsp);
 
+        versionLabel = new JLabel("version " + VERSION);
+
+        JPanel panel4 = new JPanel();
+        panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+        panel4.add(versionLabel);
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.add(panel1);
         panel.add(panel2);
         panel.add(panel3);
+        panel.add(panel4);
 
         this.add(panel);
         this.setSize(600, 400);
@@ -115,77 +131,7 @@ public class ExtractMain extends JFrame {
         extractBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(rootDirCs.getSelectedFile() == null) {
-                    JOptionPane.showMessageDialog(null, "루트경로를 선택해주세요.");
-                    return;
-                }
-                if(targetDirCs.getSelectedFile() == null) {
-                    JOptionPane.showMessageDialog(null, "추출경로를 선택해주세요.");
-                    return;
-                }
-                if(fileListCs.getSelectedFile() == null) {
-                    JOptionPane.showMessageDialog(null, "파일목록을 선택해주세요.");
-                    return;
-                }
-
-                BufferedReader reader = null;
-                FileInputStream fis = null;
-                FileOutputStream fos = null;
-                try {
-                    reader = new BufferedReader(new FileReader(fileListCs.getSelectedFile()));
-
-                    int count = 1;
-                    String line;
-                    while((line = reader.readLine()) != null) {
-                        String rootPath = rootDirCs.getSelectedFile().getPath();
-                        String targetPath = targetDirCs.getSelectedFile().getPath();
-
-                        try {
-                            File oriFile = new File(rootPath + File.separator + line);
-                            File copyFile = new File(targetPath + File.separator + line);
-                            File copyFileDir = new File(targetPath + File.separator + line.substring(0, line.lastIndexOf("\\")));
-
-                            if(!copyFileDir.exists()) {
-                                copyFileDir.mkdirs();
-                            }
-
-                            fis = new FileInputStream(oriFile);
-                            fos = new FileOutputStream(copyFile);
-
-                            int fileByte = 0;
-                            while((fileByte = fis.read()) != -1) {
-                                fos.write(fileByte);
-                            }
-
-                            jta.append((count++) + ". " + line + "\n");
-                        } catch(Exception exception) {
-                            jta.append((count++) + ". " + line + " 오류 발생!!\n");
-                        } finally {
-                            if(fis != null) {
-                                fis.close();
-                            }
-                            if(fos != null) {
-                                fos.close();
-                            }
-                        }
-                    }
-                    reader.close();
-
-                    JOptionPane.showMessageDialog(null, "파일추출을 완료하였습니다.");
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "오류가 발생하였습니다.");
-                } finally {
-                    if(reader != null) {
-                        try { reader.close(); } catch (IOException ioException) { ioException.printStackTrace(); }
-                    }
-                    if(fis != null) {
-                        try { fis.close(); } catch (IOException ioException) { ioException.printStackTrace(); }
-                    }
-                    if(fos != null) {
-                        try { fos.close(); } catch (IOException ioException) { ioException.printStackTrace(); }
-                    }
-                }
+                extractTemplate.extract(rootDirCs, targetDirCs, fileListCs, jta);
             }
         });
 
