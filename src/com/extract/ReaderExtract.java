@@ -2,11 +2,13 @@ package com.extract;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.UUID;
 
 public class ReaderExtract extends ExtractTemplate {
 
     @Override
     public void extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath, JTextArea jta) throws IOException {
+        StringBuffer outputFileList = new StringBuffer();
         int count = 1;
         String line;
         while((line = reader.readLine()) != null) {
@@ -14,20 +16,42 @@ public class ReaderExtract extends ExtractTemplate {
             if("".equals(line)) continue;
 
             try {
+                line = replacePathSeparator(line);
                 String oriPath = sourceRootReplacePath(line);
-                String destPath = "ROOT" + File.separator + targetReplacePath(line);
+                String destPath = "ROOT/" + targetReplacePath(line);
                 //System.out.println("oriPath : " + oriPath + " ==> destPath : " + destPath);
 
-                File oriFile = new File(sourceRootPath + File.separator + oriPath);
-                File destFile = new File(targetPath + File.separator + destPath);
+                File oriFile = new File(sourceRootPath + "/" + oriPath);
+                File destFile = new File(targetPath + "/" + destPath);
 
                 makeDirs(destFile);
                 copyFile(oriFile, destFile);
 
                 jta.append((count++) + ". " + line + " ==> " + destPath + "\n");
+                outputFileList.append(destPath + "\n");
             } catch(Exception e) {
                 e.printStackTrace();
                 jta.append((count++) + ". " + line + " 오류 발생!!\n");
+            }
+        }
+        jta.append("추출을 완료하였습니다.\n");
+        outputFile(targetPath, outputFileList);
+    }
+
+    public void outputFile(String targetPath, StringBuffer outputFileList) {
+        String outputFileName = "extract_" + System.currentTimeMillis() + ".txt";
+        File outputFile = new File(targetPath + "/" + outputFileName);
+
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(outputFile));
+            writer.write(outputFileList.toString());
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(writer != null) {
+                try { writer.close(); } catch (IOException e) { e.printStackTrace(); }
             }
         }
     }
@@ -41,11 +65,15 @@ public class ReaderExtract extends ExtractTemplate {
             dirFile.mkdirs();
         }
     }
+    
+    public String replacePathSeparator(String path) {
+        return path.replaceAll("\\\\", "/");
+    }
 
     public String sourceRootReplacePath(String path) {
         String ext = getExt(path);
         if("java".equals(ext)) {
-            return path.replace("src" + File.separator + "main" + File.separator + "java", "target" + File.separator + "classes")
+            return path.replaceAll("src/main/java", "target/classes")
                         .replaceAll(".java", ".class");
         }
         return path;
@@ -54,12 +82,12 @@ public class ReaderExtract extends ExtractTemplate {
     public String targetReplacePath(String path) {
         String ext = getExt(path);
         if("jsp".equals(ext)) {
-            return path.replace("src" + File.separator + "main" + File.separator + "webapp" + File.separator, "");
+            return path.replaceAll("src/main/webapp/", "");
         } else if("java".equals(ext)) {
-            return path.replace("src" + File.separator + "main" + File.separator + "java", "WEB-INF" + File.separator + "classes")
+            return path.replace("src/main/java", "WEB-INF/classes")
                         .replaceAll(".java", ".class");
         } else if("xml".equals(ext)) {
-            return path.replace("src" + File.separator + "main" + File.separator + "resources", "WEB-INF" + File.separator + "classes");
+            return path.replaceAll("src/main/resources", "WEB-INF/classes");
         }
         return path;
     }
