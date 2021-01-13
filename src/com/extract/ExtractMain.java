@@ -1,5 +1,7 @@
 package com.extract;
 
+import com.extract.util.FileUtil;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -21,6 +23,10 @@ public class ExtractMain extends JFrame {
     private JTextArea jta;
     private JScrollPane jsp;
     private RegisterFileListFrame fileListFrame;
+    private JMenuBar mb;
+    private JMenuItem inPathConfMenu;
+    private JMenuItem outPathConfMenu;
+    private JMenuItem exitMenu;
 
     private ExtractTemplate extractTemplate;
 
@@ -29,6 +35,9 @@ public class ExtractMain extends JFrame {
         super("파일 추출기");
         init();
         eventInit();
+
+        // 최초 환경파일 생성
+        FileUtil.makeConfigJsonFile();
 
         extractTemplate = new ReaderExtract();
     }
@@ -88,6 +97,18 @@ public class ExtractMain extends JFrame {
         panel.add(panel3);
         panel.add(panel4);
 
+        inPathConfMenu = new JMenuItem("가져오기");
+        outPathConfMenu = new JMenuItem("내보내기");
+        exitMenu = new JMenuItem("EXIT");
+        JMenu confMenu = new JMenu("설정");
+        confMenu.add(inPathConfMenu);
+        confMenu.add(outPathConfMenu);
+        confMenu.addSeparator();
+        confMenu.add(exitMenu);
+        mb = new JMenuBar();
+        mb.add(confMenu);
+
+        this.setJMenuBar(mb);
         this.add(panel);
         this.setSize(600, 400);
         this.setVisible(true);
@@ -97,6 +118,27 @@ public class ExtractMain extends JFrame {
     }
 
     private void eventInit() {
+        exitMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        inPathConfMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new InPathConfFrame();
+            }
+        });
+
+        outPathConfMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
         rootDirBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
