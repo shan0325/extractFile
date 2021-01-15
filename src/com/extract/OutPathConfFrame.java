@@ -1,7 +1,6 @@
 package com.extract;
 
 import com.extract.util.FileUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class InPathConfFrame extends JFrame {
+public class OutPathConfFrame extends JFrame {
 
     private JTextField[] beforeTf = new JTextField[10];
     private JTextField[] afterTf = new JTextField[10];
     private JButton registerBtn;
 
-    public InPathConfFrame() {
-        super("소스 가져오기 경로 치환 설정");
+    public OutPathConfFrame() {
+        super("소스 내보내기 경로 치환 설정");
         init();
         eventInit();
         setJsonData();
@@ -66,10 +65,10 @@ public class InPathConfFrame extends JFrame {
 
     public void setJsonData() {
         Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
-        List<String> inPathList = (List<String>) jsonObj.get("inPathList");
-        if(inPathList != null) {
-            for(int i = 0; i < inPathList.size(); i++) {
-                String pathStr = inPathList.get(i);
+        List<String> outPathList = (List<String>) jsonObj.get("outPathList");
+        if(outPathList != null) {
+            for(int i = 0; i < outPathList.size(); i++) {
+                String pathStr = outPathList.get(i);
                 if(!"".equals(pathStr)) {
                     String[] pathStrs = pathStr.split(">");
                     if(pathStrs.length == 0) {
@@ -90,14 +89,14 @@ public class InPathConfFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
-                List<String> inPathList = new ArrayList<>();
+                List<String> outPathList = new ArrayList<>();
                 for(int i = 0; i < beforeTf.length; i++) {
                     if(!"".equals(beforeTf[i].getText().trim()) || !"".equals(afterTf[i].getText().trim())) {
                         String inPath = beforeTf[i].getText().trim() + ">" + afterTf[i].getText().trim();
-                        inPathList.add(inPath);
+                        outPathList.add(inPath);
                     }
                 }
-                jsonObj.put("inPathList", inPathList);
+                jsonObj.put("outPathList", outPathList);
                 FileUtil.makeConfigJsonFile(jsonObj);
                 dispose();
             }

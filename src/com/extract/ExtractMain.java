@@ -135,7 +135,7 @@ public class ExtractMain extends JFrame {
         outPathConfMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                new OutPathConfFrame();
             }
         });
 

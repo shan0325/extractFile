@@ -4,6 +4,8 @@ import com.extract.util.FileUtil;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ReaderExtract extends ExtractTemplate {
@@ -18,9 +20,14 @@ public class ReaderExtract extends ExtractTemplate {
             if("".equals(line)) continue;
 
             try {
+                sourceRootPath = FileUtil.replacePathSeparator(sourceRootPath);
+                String rootName = sourceRootPath.substring(sourceRootPath.lastIndexOf("/") + 1);
+
                 line = FileUtil.replacePathSeparator(line);
-                String oriPath = sourceRootReplacePath(line);
-                String destPath = "ROOT/" + targetReplacePath(line);
+                //String oriPath = sourceRootReplacePath(line);
+                //String destPath = rootName + "/" + targetReplacePath(line);
+                String oriPath = sourceRootReplacePathByConfigFile(line);
+                String destPath = rootName + "/" + targetReplacePathByConfigFile(line);
                 //System.out.println("oriPath : " + oriPath + " ==> destPath : " + destPath);
 
                 File oriFile = new File(sourceRootPath + "/" + oriPath);
@@ -52,12 +59,43 @@ public class ReaderExtract extends ExtractTemplate {
     public String targetReplacePath(String path) {
         String ext = FileUtil.getExt(path);
         if("jsp".equals(ext)) {
-            return path.replaceAll("src/main/webapp/", "");
+            return path.replaceAll("src/main/webapp/", "ROOT/");
         } else if("java".equals(ext)) {
-            return path.replace("src/main/java", "WEB-INF/classes")
+            return path.replace("src/main/java", "ROOT/WEB-INF/classes")
                         .replaceAll(".java", ".class");
         } else if("xml".equals(ext)) {
-            return path.replaceAll("src/main/resources", "WEB-INF/classes");
+            return path.replaceAll("src/main/resources", "ROOT/WEB-INF/classes");
+        }
+        return path;
+    }
+
+    public String sourceRootReplacePathByConfigFile(String path) {
+        Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
+        List<String> inPathList = (List<String>) jsonObj.get("inPathList");
+        return replacePathByConfigFile(path, inPathList);
+    }
+
+    public String targetReplacePathByConfigFile(String path) {
+        Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
+        List<String> outPathList = (List<String>) jsonObj.get("outPathList");
+        return replacePathByConfigFile(path, outPathList);
+    }
+
+    public String replacePathByConfigFile(String path, List<String> pathList) {
+        if(pathList != null) {
+            for(int i = 0; i < pathList.size(); i++) {
+                String pathStr = pathList.get(i);
+                if(!"".equals(pathStr)) {
+                    String[] pathStrs = pathStr.split(">");
+                    if(pathStrs.length == 0) {
+                        continue;
+                    } else if (pathStrs.length == 1) {
+                        path = path.replaceAll(pathStrs[0], "");
+                    } else if (pathStrs.length == 2) {
+                        path = path.replaceAll(pathStrs[0], pathStrs[1]);
+                    }
+                }
+            }
         }
         return path;
     }

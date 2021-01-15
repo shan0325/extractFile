@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/extractFile_jar</output-path>
     <root id="archive" name="extractFile.jar">
       <element id="module-output" name="extractFile" />
+      <element id="library" level="project" name="lib" />
     </root>
   </artifact>
 </component>

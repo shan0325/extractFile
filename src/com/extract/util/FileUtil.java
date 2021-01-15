@@ -120,31 +120,36 @@ public class FileUtil {
             inPathList.add(".java>.class");
 
             List<String> outPathList = new ArrayList<>();
-            outPathList.add("src/main/webapp/>");
-            outPathList.add("src/main/java>WEB-INF/classes");
+            outPathList.add("src/main/webapp/>ROOT/");
+            outPathList.add("src/main/java>ROOT/WEB-INF/classes");
             outPathList.add(".java>.class");
-            outPathList.add("src/main/resources>WEB-INF/classes");
+            outPathList.add("src/main/resources>ROOT/WEB-INF/classes");
 
             jsonObj.put("inPathList", inPathList);
             jsonObj.put("outPathList", outPathList);
+            makeConfigJsonFile(jsonObj);
+        }
+    }
 
-            BufferedWriter bw = null;
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String jsonStr = objectMapper.writeValueAsString(jsonObj);
+    public static void makeConfigJsonFile(Map<String, Object> jsonObj) {
+        File jsonFile = new File(CONFIG_PATH + "/" + CONFIG_FILE_NAME);
+        BufferedWriter bw = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonStr = objectMapper.writeValueAsString(jsonObj);
 
-                bw = new BufferedWriter(new FileWriter(jsonFile));
-                bw.write(jsonStr);
-                bw.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "환경파일을 생성하지못했습니다.");
-                System.exit(0);
-            } finally {
-                if(bw != null) {
-                    try { bw.close(); } catch (IOException e) { e.printStackTrace(); }
-                }
+            bw = new BufferedWriter(new FileWriter(jsonFile));
+            bw.write(jsonStr);
+            bw.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "설정파일을 생성하지못했습니다.");
+            System.exit(0);
+        } finally {
+            if(bw != null) {
+                try { bw.close(); } catch (IOException e) { e.printStackTrace(); }
             }
         }
     }
+
 }
