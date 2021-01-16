@@ -3,7 +3,9 @@
     <output-path>$PROJECT_DIR$/out/artifacts/extractFile_jar</output-path>
     <root id="archive" name="extractFile.jar">
       <element id="module-output" name="extractFile" />
-      <element id="library" level="project" name="lib" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-annotations-2.9.8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-core-2.9.8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-databind-2.9.8.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
