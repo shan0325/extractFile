@@ -11,7 +11,7 @@ import java.io.*;
 
 public class ExtractMain extends JFrame {
 
-    private static final String VERSION = "1.0.0";
+    private static final String VERSION = "1.0.1";
 
     private JFileChooser rootDirCs;
     private JFileChooser targetDirCs;
@@ -194,7 +194,16 @@ public class ExtractMain extends JFrame {
                 String rootPath = rootDirCs.getSelectedFile().getPath();
                 String targetPath = targetDirCs.getSelectedFile().getPath();
 
-                extractTemplate.extract(rootPath, targetPath, reader, jta);
+                ExtractResult extract = extractTemplate.extract(rootPath, targetPath, reader);
+                if(extract.getErrorMsg() != null) {
+                    JOptionPane.showMessageDialog(null, extract.getErrorMsg());
+                } else {
+                    jta.append(extract.getOutputTextArea().toString());
+
+                    String result = "추출을 완료하였습니다. [총 " + extract.getCount() + ", 성공 " + extract.getSuccessCount() + ", 실패 " + extract.getFailCount() + "]";
+                    jta.append(result + "\n");
+                    JOptionPane.showMessageDialog(null, result);
+                }
             }
         });
 

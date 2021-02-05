@@ -34,24 +34,24 @@ public class FileUtil {
     }
 
     public static void copyFile(File oriFile, File destFile) throws IOException {
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
         try {
-            fis = new FileInputStream(oriFile);
-            fos = new FileOutputStream(destFile);
+            bis = new BufferedInputStream(new FileInputStream(oriFile));
+            bos = new BufferedOutputStream(new FileOutputStream(destFile));
 
             int fileByte = 0;
-            while((fileByte = fis.read()) != -1) {
-                fos.write(fileByte);
+            while((fileByte = bis.read()) != -1) {
+                bos.write(fileByte);
             }
         } catch (IOException e) {
             throw e;
         } finally {
-            if(fis != null) {
-                fis.close();
+            if(bis != null) {
+                bis.close();
             }
-            if(fos != null) {
-                fos.close();
+            if(bos != null) {
+                bos.close();
             }
         }
     }

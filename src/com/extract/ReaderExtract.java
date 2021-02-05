@@ -11,9 +11,12 @@ import java.util.UUID;
 public class ReaderExtract extends ExtractTemplate {
 
     @Override
-    public void extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath, JTextArea jta) throws IOException {
+    public ExtractResult extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath) throws IOException {
+        StringBuffer outputTextArea = new StringBuffer();
         StringBuffer outputFileList = new StringBuffer();
-        int count = 1;
+        int count = 0;
+        int successCount = 0;
+        int failCount = 0;
         String line;
         while((line = reader.readLine()) != null) {
             line = line.trim();
@@ -27,7 +30,8 @@ public class ReaderExtract extends ExtractTemplate {
                 //String oriPath = sourceRootReplacePath(line);
                 //String destPath = rootName + "/" + targetReplacePath(line);
                 String oriPath = sourceRootReplacePathByConfigFile(line);
-                String destPath = rootName + "/" + targetReplacePathByConfigFile(line);
+                String targetReplacePath = targetReplacePathByConfigFile(line);
+                String destPath = targetReplacePath.indexOf("/") == 0 ? rootName + targetReplacePath : rootName + "/" + targetReplacePath;
                 //System.out.println("oriPath : " + oriPath + " ==> destPath : " + destPath);
 
                 File oriFile = new File(sourceRootPath + "/" + oriPath);
@@ -36,15 +40,28 @@ public class ReaderExtract extends ExtractTemplate {
                 FileUtil.makeDirs(destFile);
                 FileUtil.copyFile(oriFile, destFile);
 
-                jta.append((count++) + ". " + line + " ==> " + destPath + "\n");
+                outputTextArea.append((++count) + ". " + line + " ==> " + destPath + "\n");
                 outputFileList.append(destPath + "\n");
+                successCount++;
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+                outputTextArea.append((++count) + ". [파일없음] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
+                failCount++;
             } catch(Exception e) {
                 e.printStackTrace();
-                jta.append((count++) + ". " + line + " 오류 발생!!\n");
+                outputTextArea.append((++count) + ". [오류발생] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
+                failCount++;
             }
         }
-        jta.append("추출을 완료하였습니다.\n");
         FileUtil.outputFile(targetPath, outputFileList);
+
+        ExtractResult extractResult = new ExtractResult();
+        extractResult.setCount(count);
+        extractResult.setSuccessCount(successCount);
+        extractResult.setFailCount(failCount);
+        extractResult.setOutputTextArea(outputTextArea);
+
+        return extractResult;
     }
 
     public String sourceRootReplacePath(String path) {
