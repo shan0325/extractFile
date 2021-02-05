@@ -89,15 +89,20 @@ public class ExtractMain extends JFrame {
         panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
         panel4.add(new JLabel("version " + VERSION));
 
-        JLabel readme = new JLabel("# 설명");
-        readme.setForeground(Color.RED);
+        JLabel info = new JLabel("# 설명");
+        info.setForeground(Color.RED);
+
+        JLabel warning = new JLabel("주의!! : 자바 inner class파일은 추출 되지 않음");
+        warning.setForeground(Color.RED);
+
         JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayout(4, 1));
+        panel5.setLayout(new GridLayout(5, 1));
         panel5.setBorder(BorderFactory.createEtchedBorder());
-        panel5.add(readme);
+        panel5.add(info);
         panel5.add(new JLabel("소스루트 : 추출대상 소스 루트 폴더 선택(ex D:\\Dev\\Workspace\\IB_WEB)"));
         panel5.add(new JLabel("추출경로 : 추출위치 폴더 선택"));
         panel5.add(new JLabel("파일목록 : 깃(소스트리)에서 커밋된 파일목록 복사 붙여넣기(ex src/main/java/.../DateUtil.java)"));
+        panel5.add(warning);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
