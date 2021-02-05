@@ -32,7 +32,7 @@ public class ExtractMain extends JFrame {
 
     
     public ExtractMain() {
-        super("파일 추출기");
+        super("소스 추출기");
         init();
         eventInit();
 
@@ -89,9 +89,20 @@ public class ExtractMain extends JFrame {
         panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
         panel4.add(new JLabel("version " + VERSION));
 
+        JLabel readme = new JLabel("# 설명");
+        readme.setForeground(Color.RED);
+        JPanel panel5 = new JPanel();
+        panel5.setLayout(new GridLayout(4, 1));
+        panel5.setBorder(BorderFactory.createEtchedBorder());
+        panel5.add(readme);
+        panel5.add(new JLabel("소스루트 : 추출대상 소스 루트 폴더 선택(ex D:\\Dev\\Workspace\\IB_WEB)"));
+        panel5.add(new JLabel("추출경로 : 추출위치 폴더 선택"));
+        panel5.add(new JLabel("파일목록 : 깃(소스트리)에서 커밋된 파일목록 복사 붙여넣기(ex src/main/java/.../DateUtil.java)"));
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(panel5);
         panel.add(panel1);
         panel.add(panel2);
         panel.add(panel3);
@@ -110,7 +121,7 @@ public class ExtractMain extends JFrame {
 
         this.setJMenuBar(mb);
         this.add(panel);
-        this.setSize(600, 400);
+        this.setSize(600, 500);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
