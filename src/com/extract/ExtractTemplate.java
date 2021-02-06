@@ -8,10 +8,10 @@ import java.io.IOException;
 
 public abstract class ExtractTemplate {
 
-    public final ExtractResult extract(String rootPath, String targetPath, BufferedReader reader) {
+    public final ExtractResult extract(String rootPath, String targetPath, BufferedReader reader, JTextArea jta) {
         ExtractResult extractResult = new ExtractResult();
         try {
-            extractResult = extractByFileList(reader, rootPath, targetPath);
+            extractResult = extractByFileList(reader, rootPath, targetPath, jta);
         } catch (IOException e) {
             e.printStackTrace();
             extractResult.setErrorMsg("파일을 읽을 수 없습니다. 파일을 확인해 주세요.");
@@ -23,5 +23,5 @@ public abstract class ExtractTemplate {
         return extractResult;
     }
 
-    public abstract ExtractResult extractByFileList(BufferedReader reader, String rootPath, String targetPath) throws IOException;
+    public abstract ExtractResult extractByFileList(BufferedReader reader, String rootPath, String targetPath, JTextArea jta) throws IOException;
 }

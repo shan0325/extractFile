@@ -205,21 +205,25 @@ public class ExtractMain extends JFrame {
                     return;
                 }
 
-                BufferedReader reader = new BufferedReader(new StringReader(fileList.getText()));
+                final BufferedReader reader = new BufferedReader(new StringReader(fileList.getText()));
+                final String rootPath = rootDirCs.getSelectedFile().getPath();
+                final String targetPath = targetDirCs.getSelectedFile().getPath();
 
-                String rootPath = rootDirCs.getSelectedFile().getPath();
-                String targetPath = targetDirCs.getSelectedFile().getPath();
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        ExtractResult extract = extractTemplate.extract(rootPath, targetPath, reader, jta);
+                        if(extract.getErrorMsg() != null) {
+                            JOptionPane.showMessageDialog(null, extract.getErrorMsg());
+                        } else {
+                            String result = "추출을 완료하였습니다. [총 " + extract.getCount() + ", 성공 " + extract.getSuccessCount() + ", 실패 " + extract.getFailCount() + "]";
+                            jta.append(result + "\n");
+                            JOptionPane.showMessageDialog(null, result);
+                        }
+                    }
+                };
+                thread.start();
 
-                ExtractResult extract = extractTemplate.extract(rootPath, targetPath, reader);
-                if(extract.getErrorMsg() != null) {
-                    JOptionPane.showMessageDialog(null, extract.getErrorMsg());
-                } else {
-                    jta.append(extract.getOutputTextArea().toString());
-
-                    String result = "추출을 완료하였습니다. [총 " + extract.getCount() + ", 성공 " + extract.getSuccessCount() + ", 실패 " + extract.getFailCount() + "]";
-                    jta.append(result + "\n");
-                    JOptionPane.showMessageDialog(null, result);
-                }
             }
         });
 

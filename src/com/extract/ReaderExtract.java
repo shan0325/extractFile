@@ -11,8 +11,7 @@ import java.util.UUID;
 public class ReaderExtract extends ExtractTemplate {
 
     @Override
-    public ExtractResult extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath) throws IOException {
-        StringBuffer outputTextArea = new StringBuffer();
+    public ExtractResult extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath, JTextArea jta) throws IOException {
         StringBuffer outputFileList = new StringBuffer();
         int count = 0;
         int successCount = 0;
@@ -40,26 +39,26 @@ public class ReaderExtract extends ExtractTemplate {
                 FileUtil.makeDirs(destFile);
                 FileUtil.copyFile(oriFile, destFile);
 
-                outputTextArea.append((++count) + ". " + line + " ==> " + destPath + "\n");
+                jta.append((++count) + ". " + line + " ==> " + destPath + "\n");
                 outputFileList.append(destPath + "\n");
                 successCount++;
             } catch(FileNotFoundException e) {
                 e.printStackTrace();
-                outputTextArea.append((++count) + ". [파일없음] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
+                jta.append((++count) + ". [파일없음] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
                 failCount++;
             } catch(Exception e) {
                 e.printStackTrace();
-                outputTextArea.append((++count) + ". [오류발생] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
+                jta.append((++count) + ". [오류발생] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
                 failCount++;
             }
+            jta.setCaretPosition(jta.getDocument().getLength()); // 스크롤 맨 아래로
         }
-        FileUtil.outputFile(targetPath, outputFileList);
+        FileUtil.outputFile(targetPath, outputFileList); // 성공한 파일 목록 txt파일로 추출
 
         ExtractResult extractResult = new ExtractResult();
         extractResult.setCount(count);
         extractResult.setSuccessCount(successCount);
         extractResult.setFailCount(failCount);
-        extractResult.setOutputTextArea(outputTextArea);
 
         return extractResult;
     }
