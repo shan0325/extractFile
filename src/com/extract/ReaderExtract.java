@@ -39,18 +39,38 @@ public class ReaderExtract extends ExtractTemplate {
                 File oriFile = new File(sourceRootPath + "/" + inSourcePath);
                 File destFile = new File(targetPath + "/" + destPath);
 
-                if(!oriFile.exists()) {
+                if(!oriFile.isFile() || !oriFile.exists()) {
                     jta.append((++count) + ". [파일없음] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + inSourcePath + "\n");
                     failCount++;
                     continue;
                 }
-
                 FileUtil.makeDirs(destFile);
                 FileUtil.copyFile(oriFile, destFile);
 
                 jta.append((++count) + ". " + line + " ==> " + destPath + "\n");
                 outputFileList.append(destPath + "\n");
                 successCount++;
+
+                // class파일인경우 inner class 추출
+                String oriFileName = oriFile.getName();
+                if("class".equals(FileUtil.getExt(oriFileName).toLowerCase())) {
+                    final String classFileName = oriFileName.substring(0, oriFileName.lastIndexOf("."));
+                    File[] innerClassFiles = oriFile.getParentFile().listFiles(new FilenameFilter() {
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return name.matches(classFileName + "\\$.+\\.class");
+                        }
+                    });
+                    for (int i = 0; i < innerClassFiles.length; i++) {
+                        String classDestPath = destPath.substring(0, destPath.lastIndexOf("/") + 1) + innerClassFiles[i].getName();
+                        File classDestFile = new File(targetPath + "/" + classDestPath);
+                        FileUtil.copyFile(innerClassFiles[i], classDestFile);
+
+                        jta.append((++count) + ". " + line + " ==> " + classDestPath + "\n");
+                        outputFileList.append(classDestPath + "\n");
+                        successCount++;
+                    }
+                }
             } catch(Exception e) {
                 jta.append((++count) + ". [오류발생] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + inSourcePath + "\n");
                 failCount++;
