@@ -14,7 +14,7 @@ public abstract class ExtractTemplate {
             extractResult = extractByFileList(reader, rootPath, targetPath, jta);
         } catch (IOException e) {
             e.printStackTrace();
-            extractResult.setErrorMsg("파일을 읽을 수 없습니다. 파일을 확인해 주세요.");
+            extractResult.setErrorMsg("파일을 읽을 수 없습니다. 파일목록을 확인해 주세요.");
         } finally {
             if(reader != null) {
                 try { reader.close(); } catch (IOException e) { e.printStackTrace(); }

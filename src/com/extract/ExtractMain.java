@@ -42,6 +42,7 @@ public class ExtractMain extends JFrame {
         extractTemplate = new ReaderExtract();
     }
 
+    // 초기화
     private void init() {
         String defaultJfcPath = System.getProperty("user.home") + "\\Desktop";
         String rootJfcPath = "D:\\";
@@ -134,6 +135,7 @@ public class ExtractMain extends JFrame {
     }
 
     private void eventInit() {
+        // 설정 EXIT 클릭 시
         exitMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -141,6 +143,7 @@ public class ExtractMain extends JFrame {
             }
         });
 
+        // 설정 가져오기 클릭 시
         inPathConfMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -148,6 +151,7 @@ public class ExtractMain extends JFrame {
             }
         });
 
+        // 설정 내보내기 클릭 시
         outPathConfMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -155,24 +159,35 @@ public class ExtractMain extends JFrame {
             }
         });
 
+        // 소스루트 버튼 클릭 시
         rootDirBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(rootDirCs.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    jta.append("루트경로 : " + rootDirCs.getSelectedFile().getPath() + "\n");
+                int result = rootDirCs.showOpenDialog(null);
+                if(result == JFileChooser.APPROVE_OPTION) {
+                    jta.append("소스루트경로 : " + rootDirCs.getSelectedFile().getPath() + "\n");
+                } else {
+                    rootDirCs.setSelectedFile(null);
+                    jta.append("소스루트경로 :\n");
                 }
             }
         });
 
+        // 추출경로 버튼 클릭 시
         targetDirBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(targetDirCs.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                int result = targetDirCs.showOpenDialog(null);
+                if(result == JFileChooser.APPROVE_OPTION) {
                     jta.append("추출경로 : " + targetDirCs.getSelectedFile().getPath() + "\n");
+                } else {
+                    targetDirCs.setSelectedFile(null);
+                    jta.append("추출경로 :\n");
                 }
             }
         });
 
+        // 파일목록 버튼 클릭 시
         fileListBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -183,6 +198,7 @@ public class ExtractMain extends JFrame {
             }
         });
 
+        // 추출하기 버튼 클릭 시
         extractBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -223,7 +239,6 @@ public class ExtractMain extends JFrame {
                     }
                 };
                 thread.start();
-
             }
         });
 

@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class FileUtil {
 
@@ -56,8 +54,11 @@ public class FileUtil {
         }
     }
 
-    public static void outputFile(String targetPath, StringBuffer outputFileList) {
-        String outputFileName = "extract_" + System.currentTimeMillis() + ".txt";
+    public static void outputFile(String targetPath, String rootName, StringBuffer outputFileList) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String curDate = sdf.format(new Date());
+
+        String outputFileName = rootName + "_" + curDate + ".txt";
         File outputFile = new File(targetPath + "/" + outputFileName);
 
         BufferedWriter writer = null;
@@ -96,10 +97,16 @@ public class FileUtil {
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "설정파일을 찾을 수 없습니다.\n" + CONFIG_PATH + "/" + CONFIG_FILE_NAME + " 파일을 확인해 주세요.");
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "설정파일을 읽을 수 없습니다.\n" + CONFIG_PATH + "/" + CONFIG_FILE_NAME + " 파일을 확인해 주세요.");
+            System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "설정파일 오류 발생!!\n" + CONFIG_PATH + "/" + CONFIG_FILE_NAME + " 파일을 확인해 주세요.");
+            System.exit(0);
         } finally {
             if(br != null) {
                 try { br.close(); } catch (IOException e) { e.printStackTrace(); }
@@ -124,6 +131,7 @@ public class FileUtil {
             outPathList.add("src/main/java>ROOT/WEB-INF/classes");
             outPathList.add(".java>.class");
             outPathList.add("src/main/resources>ROOT/WEB-INF/classes");
+            outPathList.add("WebContent/>/");
 
             jsonObj.put("inPathList", inPathList);
             jsonObj.put("outPathList", outPathList);

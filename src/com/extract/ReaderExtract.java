@@ -12,10 +12,15 @@ public class ReaderExtract extends ExtractTemplate {
 
     @Override
     public ExtractResult extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath, JTextArea jta) throws IOException {
+        Map<String, Object> jsonConfigMap = FileUtil.getJsonObjByConfigJsonFile(); // 설정 파일 가져오기
         StringBuffer outputFileList = new StringBuffer();
         int count = 0;
         int successCount = 0;
         int failCount = 0;
+        String rootName = "";
+        String inSourcePath = "";
+        String outSourcePath = "";
+
         String line;
         while((line = reader.readLine()) != null) {
             line = line.trim();
@@ -23,18 +28,22 @@ public class ReaderExtract extends ExtractTemplate {
 
             try {
                 sourceRootPath = FileUtil.replacePathSeparator(sourceRootPath);
-                String rootName = sourceRootPath.substring(sourceRootPath.lastIndexOf("/") + 1);
+                rootName = sourceRootPath.substring(sourceRootPath.lastIndexOf("/") + 1);
 
                 line = FileUtil.replacePathSeparator(line);
-                //String oriPath = sourceRootReplacePath(line);
-                //String destPath = rootName + "/" + targetReplacePath(line);
-                String oriPath = sourceRootReplacePathByConfigFile(line);
-                String targetReplacePath = targetReplacePathByConfigFile(line);
-                String destPath = targetReplacePath.indexOf("/") == 0 ? rootName + targetReplacePath : rootName + "/" + targetReplacePath;
-                //System.out.println("oriPath : " + oriPath + " ==> destPath : " + destPath);
+                inSourcePath = replacePathByConfigFile(line, (List<String>) jsonConfigMap.get("inPathList"));
+                outSourcePath = replacePathByConfigFile(line, (List<String>) jsonConfigMap.get("outPathList"));
+                String destPath = outSourcePath.indexOf("/") == 0 ? rootName + outSourcePath : rootName + "/" + outSourcePath;
+                //System.out.println("inSourcePath : " + inSourcePath + " ==> destPath : " + destPath);
 
-                File oriFile = new File(sourceRootPath + "/" + oriPath);
+                File oriFile = new File(sourceRootPath + "/" + inSourcePath);
                 File destFile = new File(targetPath + "/" + destPath);
+
+                if(!oriFile.exists()) {
+                    jta.append((++count) + ". [파일없음] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + inSourcePath + "\n");
+                    failCount++;
+                    continue;
+                }
 
                 FileUtil.makeDirs(destFile);
                 FileUtil.copyFile(oriFile, destFile);
@@ -42,18 +51,13 @@ public class ReaderExtract extends ExtractTemplate {
                 jta.append((++count) + ". " + line + " ==> " + destPath + "\n");
                 outputFileList.append(destPath + "\n");
                 successCount++;
-            } catch(FileNotFoundException e) {
-                e.printStackTrace();
-                jta.append((++count) + ". [파일없음] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
-                failCount++;
             } catch(Exception e) {
-                e.printStackTrace();
-                jta.append((++count) + ". [오류발생] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + sourceRootReplacePathByConfigFile(line) + "\n");
+                jta.append((++count) + ". [오류발생] " + FileUtil.replacePathSeparator(sourceRootPath) + "/" + inSourcePath + "\n");
                 failCount++;
             }
             jta.setCaretPosition(jta.getDocument().getLength()); // 스크롤 맨 아래로
         }
-        FileUtil.outputFile(targetPath, outputFileList); // 성공한 파일 목록 txt파일로 추출
+        FileUtil.outputFile(targetPath, rootName, outputFileList); // 성공한 파일 목록 txt파일로 추출
 
         ExtractResult extractResult = new ExtractResult();
         extractResult.setCount(count);
@@ -63,40 +67,7 @@ public class ReaderExtract extends ExtractTemplate {
         return extractResult;
     }
 
-    public String sourceRootReplacePath(String path) {
-        String ext = FileUtil.getExt(path);
-        if("java".equals(ext)) {
-            return path.replaceAll("src/main/java", "target/classes")
-                        .replaceAll(".java", ".class");
-        }
-        return path;
-    }
-
-    public String targetReplacePath(String path) {
-        String ext = FileUtil.getExt(path);
-        if("jsp".equals(ext)) {
-            return path.replaceAll("src/main/webapp/", "ROOT/");
-        } else if("java".equals(ext)) {
-            return path.replace("src/main/java", "ROOT/WEB-INF/classes")
-                        .replaceAll(".java", ".class");
-        } else if("xml".equals(ext)) {
-            return path.replaceAll("src/main/resources", "ROOT/WEB-INF/classes");
-        }
-        return path;
-    }
-
-    public String sourceRootReplacePathByConfigFile(String path) {
-        Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
-        List<String> inPathList = (List<String>) jsonObj.get("inPathList");
-        return replacePathByConfigFile(path, inPathList);
-    }
-
-    public String targetReplacePathByConfigFile(String path) {
-        Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
-        List<String> outPathList = (List<String>) jsonObj.get("outPathList");
-        return replacePathByConfigFile(path, outPathList);
-    }
-
+    // 경로 치환 처리
     public String replacePathByConfigFile(String path, List<String> pathList) {
         if(pathList != null) {
             for(int i = 0; i < pathList.size(); i++) {
