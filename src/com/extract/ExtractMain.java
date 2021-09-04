@@ -11,7 +11,7 @@ import java.io.*;
 
 public class ExtractMain extends JFrame {
 
-    private static final String VERSION = "1.0.1";
+    private static final String VERSION = "1.0.2";
 
     private JFileChooser rootDirCs;
     private JFileChooser targetDirCs;
@@ -53,7 +53,12 @@ public class ExtractMain extends JFrame {
 
         rootDirCs = new JFileChooser();
         rootDirCs.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        rootDirCs.setCurrentDirectory(new File(rootJfcPath)); // 기본경로지정
+        try {
+            // 기본경로지정 java_1.8 버그로 인한 Exception 처리
+            rootDirCs.setCurrentDirectory(new File(rootJfcPath));
+        } catch (Exception e) {
+            rootDirCs.setCurrentDirectory(new File(defaultJfcPath));
+        }
 
         targetDirCs = new JFileChooser();
         targetDirCs.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
