@@ -21,15 +21,16 @@ public class ReaderExtract extends ExtractTemplate {
         String inSourcePath = "";
         String outSourcePath = "";
 
+        sourceRootPath = FileUtil.replacePathSeparator(sourceRootPath);
+        rootName = sourceRootPath.substring(sourceRootPath.lastIndexOf("/") + 1);
+        rootName = FileUtil.getCheckDuplicateDirName(targetPath, rootName);
+
         String line;
         while((line = reader.readLine()) != null) {
             line = line.trim();
             if("".equals(line)) continue;
 
             try {
-                sourceRootPath = FileUtil.replacePathSeparator(sourceRootPath);
-                rootName = sourceRootPath.substring(sourceRootPath.lastIndexOf("/") + 1);
-
                 line = FileUtil.replacePathSeparator(line);
                 inSourcePath = replacePathByConfigFile(line, (List<String>) jsonConfigMap.get("inPathList"));
                 outSourcePath = replacePathByConfigFile(line, (List<String>) jsonConfigMap.get("outPathList"));

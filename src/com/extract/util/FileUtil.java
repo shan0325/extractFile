@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
 import java.io.*;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,6 +30,51 @@ public class FileUtil {
         if(!dirFile.exists()) {
             dirFile.mkdirs();
         }
+    }
+
+    /**
+     * 중복된 디렉토리명이 있으면 새로운 디렉토리명 가져오기
+     * @param dirPath
+     * @param makeDirName
+     * @return
+     */
+    public static String getCheckDuplicateDirName(String dirPath, String makeDirName) {
+        String dirName = "";
+
+        File dirPathFile = new File(dirPath);
+        if(!dirPathFile.exists()) {
+            return dirName;
+        }
+
+        File[] dirs = dirPathFile.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
+
+        List<String> dirNameList = new ArrayList<>();
+        boolean isExist = false;
+        for (File dir : dirs) {
+            dirNameList.add(dir.getName());
+            if(dir.getName().equals(makeDirName)) {
+                isExist = true;
+            }
+        }
+
+        if(!isExist) {
+            dirName = makeDirName;
+        } else if(isExist) {
+            int maxIndex = 1;
+            for (int i = 1; i < 1000; i++) {
+                String newMakeDirName = makeDirName + "_" + i;
+                if(dirNameList.contains(newMakeDirName)) {
+                    maxIndex = i;
+                }
+            }
+            dirName = makeDirName + "_" + (maxIndex + 1);
+        }
+        return dirName;
     }
 
     public static void copyFile(File oriFile, File destFile) throws IOException {

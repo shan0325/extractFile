@@ -84,7 +84,7 @@ public class SourcePathConfFrame extends JFrame {
             pathCs.setCurrentDirectory(new File(defaultJfcPath));
         }
 
-        this.setSize(600, 500);
+        this.setSize(550, 450);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
     }

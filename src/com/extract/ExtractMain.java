@@ -6,7 +6,9 @@ import com.extract.util.FileUtil;
 import com.extract.util.StringUtils;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,12 +17,11 @@ import java.util.*;
 
 public class ExtractMain extends JFrame {
 
-    private static final String VERSION = "1.0.2";
+    private static final String VERSION = "1.1.0";
 
     private JComboBox<String> rootDirCombo;
     private JFileChooser rootDirCs;
     private JFileChooser targetDirCs;
-    private JFileChooser fileListCs;
     private JButton rootDirBtn;
     private JButton targetDirBtn;
     private JButton fileListBtn;
@@ -57,8 +58,11 @@ public class ExtractMain extends JFrame {
         String rootJfcPath = "D:\\";
 
         rootDirBtn = new JButton("소스루트");
-        targetDirBtn = new JButton("추출경로");
+        rootDirBtn.setBackground(new Color(255,255,255));
+        targetDirBtn = new JButton("추출폴더");
+        targetDirBtn.setBackground(new Color(255,255,255));
         fileListBtn = new JButton("파일목록");
+        fileListBtn.setBackground(new Color(255,255,255));
 
         rootDirCs = new JFileChooser();
         rootDirCs.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -70,6 +74,7 @@ public class ExtractMain extends JFrame {
         }
 
         rootDirCombo = new JComboBox<>(new String[0]);
+        rootDirCombo.setBackground(new Color(255,255,255));
         // 소스 경로 콤보박스 셋팅
         setSourceRootDirCombo();
 
@@ -79,43 +84,36 @@ public class ExtractMain extends JFrame {
         // 추출대상경로 설정 셋팅
         setTargetDirCsCurrentDirectory();
 
-        fileListCs = new JFileChooser();
-        fileListCs.setMultiSelectionEnabled(false); // 다중 선택 불가
-        fileListCs.setCurrentDirectory(new File(defaultJfcPath)); // 기본경로지정
+        JPanel settingPanel = new JPanel();
+        settingPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        settingPanel.setBorder(new CompoundBorder(new TitledBorder(""), BorderFactory.createEmptyBorder(10, 0, 10, 0)));
+        //settingPanel.add(rootDirBtn);
+        settingPanel.add(rootDirCombo);
+        settingPanel.add(targetDirBtn);
+        settingPanel.add(fileListBtn);
 
-        JPanel panel1 = new JPanel();
-        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-        panel1.setBorder(new EmptyBorder(10, 5, 5, 10));
-//        panel1.add(rootDirBtn);
-        panel1.add(rootDirCombo);
-        panel1.add(targetDirBtn);
-        panel1.add(fileListBtn);
+        extractBtn = new JButton("추 출");
+        extractBtn.setPreferredSize(new Dimension(120, 35));
+        extractBtn.setBackground(new Color(255,255,255));
 
-        extractBtn = new JButton("추출하기");
-
-        JPanel panel2 = new JPanel();
-        panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-        panel2.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        panel2.add(extractBtn);
+        JPanel extractBtnPanel = new JPanel();
+        extractBtnPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        extractBtnPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        extractBtnPanel.add(extractBtn);
 
         jta = new JTextArea();
         jsp = new JScrollPane(jta);
-        jsp.setPreferredSize(new Dimension(0, 200));
 
-        JPanel panel3 = new JPanel();
-        panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-        panel3.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        panel3.add(jsp);
+        JPanel textAreaPanel = new JPanel();
+        textAreaPanel.setLayout(new BorderLayout());
+        textAreaPanel.add(jsp, BorderLayout.CENTER);
 
-        JPanel panel4 = new JPanel();
-        panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-        panel4.add(new JLabel("version " + VERSION));
+        JPanel versionPanel = new JPanel();
+        versionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        versionPanel.add(new JLabel("version " + VERSION));
 
-        JLabel info = new JLabel("# 설명");
+        /*JLabel info = new JLabel("# 설명");
         info.setForeground(Color.RED);
-
-        JLabel warning = new JLabel("주의!! : 자바 inner class파일은 추출 되지 않을 수 있음");
-        warning.setForeground(Color.RED);
 
         JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayout(4, 1));
@@ -123,17 +121,16 @@ public class ExtractMain extends JFrame {
         panel5.add(info);
         panel5.add(new JLabel("소스루트 : 추출대상 소스 루트 폴더 선택(ex D:\\Dev\\Workspace\\IB_WEB)"));
         panel5.add(new JLabel("추출경로 : 자신이 원하는 추출경로 폴더 선택"));
-        panel5.add(new JLabel("파일목록 : Git에 커밋된 파일목록 복사 붙여넣기(ex src/main/java/.../DateUtil.java)"));
-        //panel5.add(warning);
+        panel5.add(new JLabel("파일목록 : Git에 커밋된 파일목록 복사 붙여넣기(ex src/main/java/.../DateUtil.java)"));*/
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.add(panel5);
-        panel.add(panel1);
-        panel.add(panel2);
-        panel.add(panel3);
-        panel.add(panel4);
+        //panel.add(panel5);
+        panel.add(settingPanel);
+        panel.add(extractBtnPanel);
+        panel.add(textAreaPanel);
+        panel.add(versionPanel);
 
         sourcePathConf = new JMenuItem("프로젝트경로");
         extractPathConf = new JMenuItem("추출대상경로");
@@ -156,7 +153,7 @@ public class ExtractMain extends JFrame {
         this.setSize(600, 500);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        this.setResizable(false);
+        //this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -247,11 +244,11 @@ public class ExtractMain extends JFrame {
                     return;
                 }*/
 
-                if(rootDirCombo.getItemCount() == 0) {
+                if(rootDirCombo.getItemCount() == 1) {
                     JOptionPane.showMessageDialog(null, "프로젝트경로를 설정해주세요.");
                     return;
-                } else if(rootDirCombo.getSelectedIndex() < 0) {
-                    JOptionPane.showMessageDialog(null, "프로젝트경로를 선택해주세요.");
+                } else if(rootDirCombo.getSelectedIndex() < 1) {
+                    JOptionPane.showMessageDialog(null, "프로젝트를 선택해주세요.");
                     return;
                 } else if(targetDirCs.getSelectedFile() == null) {
                     JOptionPane.showMessageDialog(null, "추출경로를 선택해주세요.");
@@ -294,10 +291,6 @@ public class ExtractMain extends JFrame {
 
     }
 
-    private BufferedReader getBufferedReaderByFileList(JFileChooser fileListCs) throws FileNotFoundException {
-        return new BufferedReader(new FileReader(fileListCs.getSelectedFile()));
-    }
-
     // 소스경로 설정파일 맵으로 셋팅
     public Map<String, String> getSourcePathConfMap() {
         Map<String, String> sourcePathConfMap = new HashMap<>();
@@ -323,6 +316,7 @@ public class ExtractMain extends JFrame {
 
         // 초기화
         rootDirCombo.removeAllItems();
+        rootDirCombo.addItem("프로젝트 선택");
 
         sourcePathConfMap = getSourcePathConfMap();
         //rootDirCombo = new JComboBox<>(sourcePathConfMap.keySet().toArray(new String[0]));
