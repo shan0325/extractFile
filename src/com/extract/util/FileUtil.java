@@ -115,6 +115,7 @@ public class FileUtil {
         return jsonObj;
     }
 
+    // 환경파일 생성
     public static void makeConfigJsonFile() {
         File jsonFile = new File(CONFIG_PATH + "/" + CONFIG_FILE_NAME);
         if(!jsonFile.exists()) {

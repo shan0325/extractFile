@@ -1,4 +1,6 @@
-package com.extract;
+package com.extract.frame;
+
+import com.extract.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,14 +13,11 @@ public class RegisterFileListFrame extends JFrame {
     private JButton registerBtn;
     private JTextArea jta;
     private JScrollPane jsp;
-    private JTextArea parentJta;
 
-    public RegisterFileListFrame(JTextArea parentJta) {
+    public RegisterFileListFrame() {
         super("파일목록 등록");
         init();
         eventInit();
-
-        this.parentJta = parentJta;
     }
 
     public void init() {
@@ -54,16 +53,19 @@ public class RegisterFileListFrame extends JFrame {
         registerBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(e.getSource() == registerBtn) {
-                    parentJta.append("파일목록 :\n");
-                    parentJta.append(jta.getText() + "\n\n");
-                    dispose();
-                }
+                dispose();
             }
         });
     }
 
-    public JTextArea getJta() {
-        return jta;
+    public String getFileList() {
+        return jta.getText();
+    }
+    
+    public boolean isExistFileList() {
+        if("".equals(jta.getText().trim())) {
+            return false;
+        }
+        return true;
     }
 }

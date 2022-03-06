@@ -1,6 +1,9 @@
 package com.extract;
 
+import com.extract.frame.*;
+import com.extract.util.DateUtil;
 import com.extract.util.FileUtil;
+import com.extract.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,11 +11,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.util.*;
 
 public class ExtractMain extends JFrame {
 
     private static final String VERSION = "1.0.2";
 
+    private JComboBox<String> rootDirCombo;
     private JFileChooser rootDirCs;
     private JFileChooser targetDirCs;
     private JFileChooser fileListCs;
@@ -24,20 +29,24 @@ public class ExtractMain extends JFrame {
     private JScrollPane jsp;
     private RegisterFileListFrame fileListFrame;
     private JMenuBar mb;
+    private JMenuItem sourcePathConf;
+    private JMenuItem extractPathConf;
     private JMenuItem inPathConfMenu;
     private JMenuItem outPathConfMenu;
     private JMenuItem exitMenu;
 
+    private Map<String, String> sourcePathConfMap;
+
     private ExtractTemplate extractTemplate;
 
-    
     public ExtractMain() {
         super("소스 추출기");
-        init();
-        eventInit();
 
         // 최초 환경파일 생성
         FileUtil.makeConfigJsonFile();
+
+        init();
+        eventInit();
 
         extractTemplate = new ReaderExtract();
     }
@@ -60,9 +69,15 @@ public class ExtractMain extends JFrame {
             rootDirCs.setCurrentDirectory(new File(defaultJfcPath));
         }
 
+        rootDirCombo = new JComboBox<>(new String[0]);
+        // 소스 경로 콤보박스 셋팅
+        setSourceRootDirCombo();
+
         targetDirCs = new JFileChooser();
         targetDirCs.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         targetDirCs.setCurrentDirectory(new File(defaultJfcPath)); // 기본경로지정
+        // 추출대상경로 설정 셋팅
+        setTargetDirCsCurrentDirectory();
 
         fileListCs = new JFileChooser();
         fileListCs.setMultiSelectionEnabled(false); // 다중 선택 불가
@@ -71,7 +86,8 @@ public class ExtractMain extends JFrame {
         JPanel panel1 = new JPanel();
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
         panel1.setBorder(new EmptyBorder(10, 5, 5, 10));
-        panel1.add(rootDirBtn);
+//        panel1.add(rootDirBtn);
+        panel1.add(rootDirCombo);
         panel1.add(targetDirBtn);
         panel1.add(fileListBtn);
 
@@ -119,10 +135,15 @@ public class ExtractMain extends JFrame {
         panel.add(panel3);
         panel.add(panel4);
 
+        sourcePathConf = new JMenuItem("프로젝트경로");
+        extractPathConf = new JMenuItem("추출대상경로");
         inPathConfMenu = new JMenuItem("가져오기");
         outPathConfMenu = new JMenuItem("내보내기");
         exitMenu = new JMenuItem("EXIT");
         JMenu confMenu = new JMenu("설정");
+        confMenu.add(sourcePathConf);
+        confMenu.add(extractPathConf);
+        confMenu.addSeparator();
         confMenu.add(inPathConfMenu);
         confMenu.add(outPathConfMenu);
         confMenu.addSeparator();
@@ -145,6 +166,22 @@ public class ExtractMain extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
+            }
+        });
+
+        // 설정 소스경로 클릭 시
+        sourcePathConf.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new SourcePathConfFrame(ExtractMain.this);
+            }
+        });
+        
+        // 설정 추출경로 클릭 시
+        extractPathConf.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ExtractPathConfFrame(ExtractMain.this);
             }
         });
 
@@ -182,12 +219,9 @@ public class ExtractMain extends JFrame {
         targetDirBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int result = targetDirCs.showOpenDialog(null);
-                if(result == JFileChooser.APPROVE_OPTION) {
-                    jta.append("추출경로 : " + targetDirCs.getSelectedFile().getPath() + "\n");
-                } else {
-                    targetDirCs.setSelectedFile(null);
-                    jta.append("추출경로 :\n");
+                int result = targetDirCs.showOpenDialog(null); // 열기용 창 오픈
+                if(result == JFileChooser.APPROVE_OPTION) { // 열기를 클릭
+                    targetDirCs.setCurrentDirectory(targetDirCs.getSelectedFile());
                 }
             }
         });
@@ -196,10 +230,11 @@ public class ExtractMain extends JFrame {
         fileListBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                /*if(fileListCs.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    jta.append("파일목록 : " + fileListCs.getSelectedFile().getPath() + "\n");
-                }*/
-                fileListFrame = new RegisterFileListFrame(jta);
+                if(fileListFrame == null) {
+                    fileListFrame = new RegisterFileListFrame();
+                } else {
+                    fileListFrame.setVisible(true);
+                }
             }
         });
 
@@ -207,28 +242,37 @@ public class ExtractMain extends JFrame {
         extractBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(rootDirCs.getSelectedFile() == null) {
+                /*if(rootDirCs.getSelectedFile() == null) {
                     JOptionPane.showMessageDialog(null, "소스루트경로를 선택해주세요.");
                     return;
-                }
-                else if(targetDirCs.getSelectedFile() == null) {
+                }*/
+
+                if(rootDirCombo.getItemCount() == 0) {
+                    JOptionPane.showMessageDialog(null, "프로젝트경로를 설정해주세요.");
+                    return;
+                } else if(rootDirCombo.getSelectedIndex() < 0) {
+                    JOptionPane.showMessageDialog(null, "프로젝트경로를 선택해주세요.");
+                    return;
+                } else if(targetDirCs.getSelectedFile() == null) {
                     JOptionPane.showMessageDialog(null, "추출경로를 선택해주세요.");
                     return;
-                }
-                else if(fileListFrame == null) {
+                } else if(fileListFrame == null || !fileListFrame.isExistFileList()) {
                     JOptionPane.showMessageDialog(null, "파일목록을 등록해주세요.");
                     return;
                 }
 
-                JTextArea fileList = fileListFrame.getJta();
-                if("".equals(fileList.getText().trim())) {
-                    JOptionPane.showMessageDialog(null, "파일목록을 등록해주세요.");
-                    return;
-                }
-
-                final BufferedReader reader = new BufferedReader(new StringReader(fileList.getText()));
-                final String rootPath = rootDirCs.getSelectedFile().getPath();
+                final BufferedReader reader = new BufferedReader(new StringReader(fileListFrame.getFileList()));
+                //final String rootPath = rootDirCs.getSelectedFile().getPath();
+                final String rootPath = sourcePathConfMap.get((String) rootDirCombo.getSelectedItem());
                 final String targetPath = targetDirCs.getSelectedFile().getPath();
+
+                jta.setText("================== EXTRACT INFORMATION ==================\n");
+                jta.append("프로젝트경로 : " + rootPath + "\n");
+                jta.append("추출경로 : " + targetPath + "\n");
+                jta.append("파일목록 :\n");
+                jta.append(fileListFrame.getFileList() + "\n");
+                jta.append("==========================================================\n\n");
+                jta.append(DateUtil.getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + " : START EXTRACTING FILES\n");
 
                 Thread thread = new Thread() {
                     @Override
@@ -239,6 +283,7 @@ public class ExtractMain extends JFrame {
                         } else {
                             String result = "추출을 완료하였습니다. [총 " + extract.getCount() + ", 성공 " + extract.getSuccessCount() + ", 실패 " + extract.getFailCount() + "]";
                             jta.append(result + "\n");
+                            jta.append(DateUtil.getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + " : END EXTRACTION FILE");
                             JOptionPane.showMessageDialog(null, result);
                         }
                     }
@@ -251,6 +296,55 @@ public class ExtractMain extends JFrame {
 
     private BufferedReader getBufferedReaderByFileList(JFileChooser fileListCs) throws FileNotFoundException {
         return new BufferedReader(new FileReader(fileListCs.getSelectedFile()));
+    }
+
+    // 소스경로 설정파일 맵으로 셋팅
+    public Map<String, String> getSourcePathConfMap() {
+        Map<String, String> sourcePathConfMap = new HashMap<>();
+
+        Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
+        java.util.List<String> sourcePathList = (java.util.List<String>) jsonObj.get("sourcePathList");
+        if(sourcePathList == null) return sourcePathConfMap;
+
+        for(int i = 0; i < sourcePathList.size(); i++) {
+            String pathStr = sourcePathList.get(i);
+            if(pathStr != null && !"".equals(pathStr) && pathStr.length() > 1) {
+                String[] pathStrs = pathStr.split(">");
+                if(pathStrs.length == 2) {
+                    sourcePathConfMap.put(pathStrs[0], pathStrs[1]);
+                }
+            }
+        }
+        return sourcePathConfMap;
+    }
+
+    public void setSourceRootDirCombo() {
+        if(rootDirCombo == null) return;
+
+        // 초기화
+        rootDirCombo.removeAllItems();
+
+        sourcePathConfMap = getSourcePathConfMap();
+        //rootDirCombo = new JComboBox<>(sourcePathConfMap.keySet().toArray(new String[0]));
+
+        Set<String> sourcePathKeySet = sourcePathConfMap.keySet();
+        Iterator<String> sourcePathIter = sourcePathKeySet.iterator();
+        while (sourcePathIter.hasNext()) {
+            rootDirCombo.addItem(sourcePathIter.next());
+        }
+    }
+
+    public void setTargetDirCsCurrentDirectory() {
+        Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
+        String extractPath = (String) jsonObj.get("extractPath");
+        if(StringUtils.isEmpty(extractPath)) return;
+
+        File extractDir = new File(extractPath);
+        if(!extractDir.exists() || !extractDir.isDirectory()) {
+            return;
+        }
+        targetDirCs.setSelectedFile(extractDir);
+        targetDirCs.setCurrentDirectory(extractDir);
     }
 
     public static void main(String[] args) {

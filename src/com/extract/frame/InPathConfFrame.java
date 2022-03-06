@@ -1,4 +1,4 @@
-package com.extract;
+package com.extract.frame;
 
 import com.extract.util.FileUtil;
 
@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class OutPathConfFrame extends JFrame {
+public class InPathConfFrame extends JFrame {
 
     private JTextField[] beforeTf = new JTextField[10];
     private JTextField[] afterTf = new JTextField[10];
     private JButton registerBtn;
 
-    public OutPathConfFrame() {
-        super("소스 내보내기 경로 치환 설정");
+    public InPathConfFrame() {
+        super("소스 가져오기 경로 치환 설정");
         init();
         eventInit();
         setJsonData();
@@ -65,20 +65,20 @@ public class OutPathConfFrame extends JFrame {
 
     public void setJsonData() {
         Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
-        List<String> outPathList = (List<String>) jsonObj.get("outPathList");
-        if(outPathList != null) {
-            for(int i = 0; i < outPathList.size(); i++) {
-                String pathStr = outPathList.get(i);
-                if(!"".equals(pathStr)) {
-                    String[] pathStrs = pathStr.split(">");
-                    if(pathStrs.length == 0) {
-                        continue;
-                    } else if(pathStrs.length == 1) {
-                        beforeTf[i].setText(pathStrs[0]);
-                    } else if(pathStrs.length == 2) {
-                        beforeTf[i].setText(pathStrs[0]);
-                        afterTf[i].setText(pathStrs[1]);
-                    }
+        List<String> inPathList = (List<String>) jsonObj.get("inPathList");
+        if(inPathList == null) return;
+
+        for(int i = 0; i < inPathList.size(); i++) {
+            String pathStr = inPathList.get(i);
+            if(!"".equals(pathStr)) {
+                String[] pathStrs = pathStr.split(">");
+                if(pathStrs.length == 0) {
+                    continue;
+                } else if(pathStrs.length == 1) {
+                    beforeTf[i].setText(pathStrs[0]);
+                } else if(pathStrs.length == 2) {
+                    beforeTf[i].setText(pathStrs[0]);
+                    afterTf[i].setText(pathStrs[1]);
                 }
             }
         }
@@ -89,14 +89,14 @@ public class OutPathConfFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
-                List<String> outPathList = new ArrayList<>();
+                List<String> inPathList = new ArrayList<>();
                 for(int i = 0; i < beforeTf.length; i++) {
                     if(!"".equals(beforeTf[i].getText().trim()) || !"".equals(afterTf[i].getText().trim())) {
                         String inPath = beforeTf[i].getText().trim() + ">" + afterTf[i].getText().trim();
-                        outPathList.add(inPath);
+                        inPathList.add(inPath);
                     }
                 }
-                jsonObj.put("outPathList", outPathList);
+                jsonObj.put("inPathList", inPathList);
                 FileUtil.makeConfigJsonFile(jsonObj);
                 dispose();
             }
