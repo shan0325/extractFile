@@ -1,5 +1,6 @@
 package com.extract;
 
+import com.extract.exception.DirectoryNotFoundException;
 import com.extract.util.FileUtil;
 
 import javax.swing.*;
@@ -11,7 +12,7 @@ import java.util.UUID;
 public class ReaderExtract extends ExtractTemplate {
 
     @Override
-    public ExtractResult extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath, JTextArea jta) throws IOException {
+    public ExtractResult extractByFileList(BufferedReader reader, String sourceRootPath, String targetPath, JTextArea jta) throws Exception {
         Map<String, Object> jsonConfigMap = FileUtil.getJsonObjByConfigJsonFile(); // 설정 파일 가져오기
         StringBuffer outputFileList = new StringBuffer();
         int count = 0;
@@ -23,7 +24,7 @@ public class ReaderExtract extends ExtractTemplate {
 
         sourceRootPath = FileUtil.replacePathSeparator(sourceRootPath);
         rootName = sourceRootPath.substring(sourceRootPath.lastIndexOf("/") + 1);
-        rootName = FileUtil.getCheckDuplicateDirName(targetPath, rootName);
+        rootName = FileUtil.getCheckDuplicateDirName(targetPath, rootName); //디렉토리 중복 제거
 
         String line;
         while((line = reader.readLine()) != null) {

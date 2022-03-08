@@ -133,7 +133,7 @@ public class ExtractMain extends JFrame {
         panel.add(versionPanel);
 
         sourcePathConf = new JMenuItem("프로젝트경로");
-        extractPathConf = new JMenuItem("추출대상경로");
+        extractPathConf = new JMenuItem("추출기본폴더");
         inPathConfMenu = new JMenuItem("가져오기");
         outPathConfMenu = new JMenuItem("내보내기");
         exitMenu = new JMenuItem("EXIT");

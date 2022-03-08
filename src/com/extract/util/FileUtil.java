@@ -1,13 +1,16 @@
 package com.extract.util;
 
+import com.extract.exception.DirectoryNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
 import java.io.*;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class FileUtil {
 
@@ -33,48 +36,46 @@ public class FileUtil {
     }
 
     /**
-     * 중복된 디렉토리명이 있으면 새로운 디렉토리명 가져오기
+     * 중복된 디렉토리명이 있으면 새로운 디렉토리명 만들기
      * @param dirPath
      * @param makeDirName
      * @return
      */
     public static String getCheckDuplicateDirName(String dirPath, String makeDirName) {
-        String dirName = "";
 
         File dirPathFile = new File(dirPath);
         if(!dirPathFile.exists()) {
-            return dirName;
+            throw new DirectoryNotFoundException("Error : 디렉토리가 존재하지 않습니다. [" + dirPath + "]");
         }
 
+        final String pattern = makeDirName + "(_[0-9]*)?";
         File[] dirs = dirPathFile.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return pathname.isDirectory();
+                return pathname.isDirectory() && Pattern.matches(pattern, pathname.getName());
             }
         });
 
-        List<String> dirNameList = new ArrayList<>();
-        boolean isExist = false;
-        for (File dir : dirs) {
-            dirNameList.add(dir.getName());
-            if(dir.getName().equals(makeDirName)) {
-                isExist = true;
-            }
+        if(dirs.length == 0) {
+            return makeDirName;
         }
 
-        if(!isExist) {
-            dirName = makeDirName;
-        } else if(isExist) {
-            int maxIndex = 1;
-            for (int i = 1; i < 1000; i++) {
-                String newMakeDirName = makeDirName + "_" + i;
-                if(dirNameList.contains(newMakeDirName)) {
-                    maxIndex = i;
-                }
+        String newMakeDirName = "";
+        try {
+            int maxNum = 0;
+            for (File dir : dirs) {
+                String dirName = dir.getName();
+                if(dirName.equals(makeDirName)) continue;
+
+                int num = Integer.parseInt(dirName.substring(dirName.lastIndexOf("_") + 1));
+                if(maxNum < num) maxNum = num;
             }
-            dirName = makeDirName + "_" + (maxIndex + 1);
+            newMakeDirName = makeDirName + "_" + (maxNum + 1);
+        } catch (Exception e) {
+            newMakeDirName = makeDirName;
         }
-        return dirName;
+
+        return newMakeDirName;
     }
 
     public static void copyFile(File oriFile, File destFile) throws IOException {

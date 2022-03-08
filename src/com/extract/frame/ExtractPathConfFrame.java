@@ -25,7 +25,7 @@ public class ExtractPathConfFrame extends JFrame {
     private ExtractMain extractMain;
 
     public ExtractPathConfFrame(ExtractMain extractMain) {
-        super("추출 대상 경로 설정");
+        super("추출 기본 디렉토리 설정");
 
         this.extractMain = extractMain;
         init();
