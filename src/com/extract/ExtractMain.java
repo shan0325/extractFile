@@ -34,6 +34,7 @@ public class ExtractMain extends JFrame {
     private JMenuItem extractPathConf;
     private JMenuItem inPathConfMenu;
     private JMenuItem outPathConfMenu;
+    private JMenuItem readme;
     private JMenuItem exitMenu;
 
     private Map<String, String> sourcePathConfMap;
@@ -59,7 +60,7 @@ public class ExtractMain extends JFrame {
 
         rootDirBtn = new JButton("소스루트");
         rootDirBtn.setBackground(new Color(255,255,255));
-        targetDirBtn = new JButton("추출폴더");
+        targetDirBtn = new JButton("추출경로");
         targetDirBtn.setBackground(new Color(255,255,255));
         fileListBtn = new JButton("파일목록");
         fileListBtn.setBackground(new Color(255,255,255));
@@ -133,9 +134,10 @@ public class ExtractMain extends JFrame {
         panel.add(versionPanel);
 
         sourcePathConf = new JMenuItem("프로젝트경로");
-        extractPathConf = new JMenuItem("추출기본폴더");
+        extractPathConf = new JMenuItem("추출기본경로");
         inPathConfMenu = new JMenuItem("가져오기");
         outPathConfMenu = new JMenuItem("내보내기");
+        readme = new JMenuItem("README");
         exitMenu = new JMenuItem("EXIT");
         JMenu confMenu = new JMenu("설정");
         confMenu.add(sourcePathConf);
@@ -143,6 +145,8 @@ public class ExtractMain extends JFrame {
         confMenu.addSeparator();
         confMenu.add(inPathConfMenu);
         confMenu.add(outPathConfMenu);
+        confMenu.addSeparator();
+        confMenu.add(readme);
         confMenu.addSeparator();
         confMenu.add(exitMenu);
         mb = new JMenuBar();
@@ -166,7 +170,15 @@ public class ExtractMain extends JFrame {
             }
         });
 
-        // 설정 소스경로 클릭 시
+        // 설정 README 클릭 시
+        readme.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ReadmeFrame();
+            }
+        });
+
+        // 설정 프로젝트경로 클릭 시
         sourcePathConf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -174,7 +186,7 @@ public class ExtractMain extends JFrame {
             }
         });
         
-        // 설정 추출경로 클릭 시
+        // 설정 추출기본경로 클릭 시
         extractPathConf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

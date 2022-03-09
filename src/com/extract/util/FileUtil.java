@@ -48,7 +48,7 @@ public class FileUtil {
             throw new DirectoryNotFoundException("Error : 디렉토리가 존재하지 않습니다. [" + dirPath + "]");
         }
 
-        final String pattern = makeDirName + "(_[0-9]*)?";
+        final String pattern = "^" + makeDirName + "(_[0-9]+)?$";
         File[] dirs = dirPathFile.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
