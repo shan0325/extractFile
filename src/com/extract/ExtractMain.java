@@ -17,7 +17,7 @@ import java.util.*;
 
 public class ExtractMain extends JFrame {
 
-    private static final String VERSION = "1.1.0";
+    private static final String VERSION = "1.1.1";
 
     private JComboBox<String> rootDirCombo;
     private JFileChooser rootDirCs;
@@ -42,7 +42,7 @@ public class ExtractMain extends JFrame {
     private ExtractTemplate extractTemplate;
 
     public ExtractMain() {
-        super("소스 추출기");
+        super("모아모아");
 
         // 최초 환경파일 생성
         FileUtil.makeConfigJsonFile();
@@ -305,7 +305,7 @@ public class ExtractMain extends JFrame {
 
     // 소스경로 설정파일 맵으로 셋팅
     public Map<String, String> getSourcePathConfMap() {
-        Map<String, String> sourcePathConfMap = new HashMap<>();
+        Map<String, String> sourcePathConfMap = new LinkedHashMap<>();
 
         Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
         java.util.List<String> sourcePathList = (java.util.List<String>) jsonObj.get("sourcePathList");

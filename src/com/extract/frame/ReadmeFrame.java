@@ -22,11 +22,11 @@ public class ReadmeFrame extends JFrame {
         panel.add(new JLabel(""));
         panel.add(info);
         panel.add(new JLabel(""));
-        panel.add(new JLabel("프로젝트 선택 : 소스 추출 대상 프로젝트 선택(설정에서 프로젝트 추가 필요)"));
+        panel.add(new JLabel("프로젝트 선택 : 소스를 추출할 프로젝트 선택(설정에서 프로젝트 셋팅 필요)"));
         panel.add(new JLabel(""));
-        panel.add(new JLabel("추출경로 : 소스를 추출하여 다운 받을 경로(디렉토리) 선택"));
+        panel.add(new JLabel("추출경로 : 소스를 다운 받을 디렉토리 선택"));
         panel.add(new JLabel(""));
-        panel.add(new JLabel("파일목록 : 추출할 소스 파일 경로 등록(ex src/main/java/.../DateUtil.java)"));
+        panel.add(new JLabel("파일목록 : 추출할 소스 파일 목록 등록(ex src/main/java/.../DateUtil.java)"));
 
         this.setLayout(new FlowLayout(FlowLayout.LEFT));
         this.add(panel);
