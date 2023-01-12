@@ -159,6 +159,7 @@ public class ExtractMain extends JFrame {
         this.setLocationRelativeTo(null);
         //this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setIconImage(new ImageIcon(getClass().getResource("/icon/crocodile.png")).getImage()); // 아이콘
     }
 
     private void eventInit() {
