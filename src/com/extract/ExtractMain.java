@@ -28,7 +28,7 @@ public class ExtractMain extends JFrame {
     private JButton extractBtn;
     private JTextArea jta;
     private JScrollPane jsp;
-    private RegisterFileListFrame fileListFrame;
+    private RegisterFileList fileListFrame;
     private JMenuBar mb;
     private JMenuItem sourcePathConf;
     private JMenuItem extractPathConf;
@@ -241,9 +241,10 @@ public class ExtractMain extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(fileListFrame == null) {
-                    fileListFrame = new RegisterFileListFrame();
+                    //fileListFrame = new RegisterFileListFrame();
+                    fileListFrame = new RegisterGitFileListFrame(sourcePathConfMap.get((String) rootDirCombo.getSelectedItem()));
                 } else {
-                    fileListFrame.setVisible(true);
+                    ((JFrame)fileListFrame).setVisible(true);
                 }
             }
         });

@@ -1,23 +1,25 @@
 package com.extract.frame;
 
-import com.extract.util.StringUtils;
+import com.extract.util.CmdUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class RegisterFileListFrame extends JFrame implements RegisterFileList {
+public class RegisterGitFileListFrame extends JFrame implements RegisterFileList {
 
     private JButton registerBtn;
     private JTextArea jta;
     private JScrollPane jsp;
+    private String projectPath;
 
-    public RegisterFileListFrame() {
+    public RegisterGitFileListFrame(String projectPath) {
         super("파일목록 등록");
+        this.projectPath = projectPath;
         init();
         eventInit();
+        setGitFileList();
     }
 
     public void init() {
@@ -56,6 +58,17 @@ public class RegisterFileListFrame extends JFrame implements RegisterFileList {
                 dispose();
             }
         });
+    }
+
+    private void setGitFileList() {
+        String gitCmd = this.projectPath;
+        System.out.println("gitCmd = " + gitCmd);
+
+        CmdUtil cmd = new CmdUtil();
+        String exec = cmd.exec("git -C D:\\Dev\\Workspace\\IB_WEB diff origin/master..#9825_모바일문화상품권_도입_건 --name-only");
+        System.out.println("exec = " + exec);
+
+        this.jta.append(exec);
     }
 
     @Override
