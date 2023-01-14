@@ -1,6 +1,5 @@
 package com.extract.frame;
 
-import com.extract.ExtractMainFrame;
 import com.extract.util.FileUtil;
 
 import javax.swing.*;

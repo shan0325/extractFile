@@ -12,7 +12,8 @@ public class ProcessBulderUtil {
         BufferedReader reader = null;
         try {
             process = new ProcessBuilder(cmd).start();
-            reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "MS949"));
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            //reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "MS949"));
             String line = null;
             StringBuffer sb = new StringBuffer();
             while ((line = reader.readLine()) != null) {

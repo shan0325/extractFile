@@ -1,6 +1,8 @@
-package com.extract;
+package com.extract.frame;
 
-import com.extract.frame.*;
+import com.extract.ExtractResult;
+import com.extract.ExtractTemplate;
+import com.extract.ReaderExtract;
 import com.extract.util.DateUtil;
 import com.extract.util.FileUtil;
 import com.extract.util.StringUtils;
@@ -225,7 +227,6 @@ public class ExtractMainFrame extends JFrame {
                 } else {
                     fileListFrame.showFrameInit();
                 }
-                setEnabled(false);
             }
         });
 

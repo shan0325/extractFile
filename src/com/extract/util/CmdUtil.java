@@ -13,7 +13,7 @@ public class CmdUtil {
         BufferedReader reader = null;
         try {
             process = Runtime.getRuntime().exec("cmd /c " + cmd);
-            reader = new BufferedReader(new InputStreamReader(process.getInputStream(), "MS949"));
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = null;
             StringBuffer sb = new StringBuffer();
             while ((line = reader.readLine()) != null) {
