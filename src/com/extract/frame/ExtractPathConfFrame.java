@@ -1,6 +1,6 @@
 package com.extract.frame;
 
-import com.extract.ExtractMain;
+import com.extract.ExtractMainFrame;
 import com.extract.util.FileUtil;
 
 import javax.swing.*;
@@ -8,8 +8,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class ExtractPathConfFrame extends JFrame {
@@ -22,12 +20,12 @@ public class ExtractPathConfFrame extends JFrame {
     private JFileChooser pathCs;
     private JButton registerBtn;
 
-    private ExtractMain extractMain;
+    private ExtractMainFrame extractMainFrame;
 
-    public ExtractPathConfFrame(ExtractMain extractMain) {
+    public ExtractPathConfFrame(ExtractMainFrame extractMainFrame) {
         super("추출 기본 경로 설정");
 
-        this.extractMain = extractMain;
+        this.extractMainFrame = extractMainFrame;
         init();
         eventInit();
         setJsonData();
@@ -95,7 +93,7 @@ public class ExtractPathConfFrame extends JFrame {
                 FileUtil.makeConfigJsonFile(jsonObj);
 
                 // 부모창 추출 경로 셋팅
-                ExtractPathConfFrame.this.extractMain.setTargetDirCsCurrentDirectory();
+                extractMainFrame.setTargetDirCsCurrentDirectory();
                 dispose();
             }
         });

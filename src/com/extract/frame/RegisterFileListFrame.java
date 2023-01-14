@@ -59,6 +59,11 @@ public class RegisterFileListFrame extends JFrame implements RegisterFileList {
     }
 
     @Override
+    public void removeFileList() {
+        this.jta.setText("");
+    }
+
+    @Override
     public String getFileList() {
         return jta.getText();
     }
@@ -69,5 +74,10 @@ public class RegisterFileListFrame extends JFrame implements RegisterFileList {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void showFrameInit() {
+        this.setVisible(true);
     }
 }

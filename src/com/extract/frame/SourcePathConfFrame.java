@@ -1,14 +1,12 @@
 package com.extract.frame;
 
-import com.extract.ExtractMain;
+import com.extract.ExtractMainFrame;
 import com.extract.util.FileUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +23,12 @@ public class SourcePathConfFrame extends JFrame {
     private JFileChooser pathCs;
     private JButton registerBtn;
 
-    private ExtractMain extractMain;
+    private ExtractMainFrame extractMainFrame;
 
-    public SourcePathConfFrame(ExtractMain extractMain) {
+    public SourcePathConfFrame(ExtractMainFrame extractMainFrame) {
         super("프로젝트 경로 설정");
 
-        this.extractMain = extractMain;
+        this.extractMainFrame = extractMainFrame;
         init();
         eventInit();
         setJsonData();
@@ -125,7 +123,7 @@ public class SourcePathConfFrame extends JFrame {
                 FileUtil.makeConfigJsonFile(jsonObj);
 
                 // 부모창 소스 경로 콤보박스 셋팅
-                SourcePathConfFrame.this.extractMain.setSourceRootDirCombo();
+                extractMainFrame.setSourceRootDirCombo();
                 dispose();
             }
         });

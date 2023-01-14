@@ -7,22 +7,22 @@ import com.extract.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.*;
 import java.util.*;
 
-public class ExtractMain extends JFrame {
+public class ExtractMainFrame extends JFrame {
 
     private static final String VERSION = "1.1.1";
 
     private JComboBox<String> rootDirCombo;
     private JFileChooser rootDirCs;
     private JFileChooser targetDirCs;
-    private JButton rootDirBtn;
     private JButton targetDirBtn;
     private JButton fileListBtn;
     private JButton extractBtn;
@@ -41,11 +41,8 @@ public class ExtractMain extends JFrame {
 
     private ExtractTemplate extractTemplate;
 
-    public ExtractMain() {
+    public ExtractMainFrame() {
         super("모아모아");
-
-        // 최초 환경파일 생성
-        FileUtil.makeConfigJsonFile();
 
         init();
         eventInit();
@@ -58,12 +55,10 @@ public class ExtractMain extends JFrame {
         String defaultJfcPath = System.getProperty("user.home") + "\\Desktop";
         String rootJfcPath = "D:\\";
 
-        rootDirBtn = new JButton("소스루트");
-        rootDirBtn.setBackground(new Color(255,255,255));
         targetDirBtn = new JButton("추출경로");
-        targetDirBtn.setBackground(new Color(255,255,255));
+        targetDirBtn.setBackground(Color.WHITE);
         fileListBtn = new JButton("파일목록");
-        fileListBtn.setBackground(new Color(255,255,255));
+        fileListBtn.setBackground(Color.WHITE);
 
         rootDirCs = new JFileChooser();
         rootDirCs.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -75,7 +70,7 @@ public class ExtractMain extends JFrame {
         }
 
         rootDirCombo = new JComboBox<>(new String[0]);
-        rootDirCombo.setBackground(new Color(255,255,255));
+        rootDirCombo.setBackground(Color.WHITE);
         // 소스 경로 콤보박스 셋팅
         setSourceRootDirCombo();
 
@@ -88,14 +83,13 @@ public class ExtractMain extends JFrame {
         JPanel settingPanel = new JPanel();
         settingPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         settingPanel.setBorder(new CompoundBorder(new TitledBorder(""), BorderFactory.createEmptyBorder(10, 0, 10, 0)));
-        //settingPanel.add(rootDirBtn);
         settingPanel.add(rootDirCombo);
         settingPanel.add(targetDirBtn);
         settingPanel.add(fileListBtn);
 
         extractBtn = new JButton("추 출");
         extractBtn.setPreferredSize(new Dimension(120, 35));
-        extractBtn.setBackground(new Color(255,255,255));
+        extractBtn.setBackground(Color.WHITE);
 
         JPanel extractBtnPanel = new JPanel();
         extractBtnPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -113,21 +107,9 @@ public class ExtractMain extends JFrame {
         versionPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         versionPanel.add(new JLabel("version " + VERSION));
 
-        /*JLabel info = new JLabel("# 설명");
-        info.setForeground(Color.RED);
-
-        JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayout(4, 1));
-        panel5.setBorder(BorderFactory.createEtchedBorder());
-        panel5.add(info);
-        panel5.add(new JLabel("소스루트 : 추출대상 소스 루트 폴더 선택(ex D:\\Dev\\Workspace\\IB_WEB)"));
-        panel5.add(new JLabel("추출경로 : 자신이 원하는 추출경로 폴더 선택"));
-        panel5.add(new JLabel("파일목록 : Git에 커밋된 파일목록 복사 붙여넣기(ex src/main/java/.../DateUtil.java)"));*/
-
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        //panel.add(panel5);
         panel.add(settingPanel);
         panel.add(extractBtnPanel);
         panel.add(textAreaPanel);
@@ -183,7 +165,7 @@ public class ExtractMain extends JFrame {
         sourcePathConf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SourcePathConfFrame(ExtractMain.this);
+                new SourcePathConfFrame(ExtractMainFrame.this);
             }
         });
         
@@ -191,7 +173,7 @@ public class ExtractMain extends JFrame {
         extractPathConf.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new ExtractPathConfFrame(ExtractMain.this);
+                new ExtractPathConfFrame(ExtractMainFrame.this);
             }
         });
 
@@ -211,16 +193,13 @@ public class ExtractMain extends JFrame {
             }
         });
 
-        // 소스루트 버튼 클릭 시
-        rootDirBtn.addActionListener(new ActionListener() {
+        // 프로젝트 선택 콤보박스 선택 시
+        rootDirCombo.addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                int result = rootDirCs.showOpenDialog(null);
-                if(result == JFileChooser.APPROVE_OPTION) {
-                    jta.append("소스루트경로 : " + rootDirCs.getSelectedFile().getPath() + "\n");
-                } else {
-                    rootDirCs.setSelectedFile(null);
-                    jta.append("소스루트경로 :\n");
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    Object item = e.getItem(); // 선택한 아이템
+                    fileListFrame = null;
                 }
             }
         });
@@ -242,10 +221,11 @@ public class ExtractMain extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(fileListFrame == null) {
                     //fileListFrame = new RegisterFileListFrame();
-                    fileListFrame = new RegisterGitFileListFrame(sourcePathConfMap.get((String) rootDirCombo.getSelectedItem()));
+                    fileListFrame = new RegisterGitFileListFrame(ExtractMainFrame.this);
                 } else {
-                    ((JFrame)fileListFrame).setVisible(true);
+                    fileListFrame.showFrameInit();
                 }
+                setEnabled(false);
             }
         });
 
@@ -253,11 +233,6 @@ public class ExtractMain extends JFrame {
         extractBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                /*if(rootDirCs.getSelectedFile() == null) {
-                    JOptionPane.showMessageDialog(null, "소스루트경로를 선택해주세요.");
-                    return;
-                }*/
-
                 if(rootDirCombo.getItemCount() == 1) {
                     JOptionPane.showMessageDialog(null, "프로젝트경로를 설정해주세요.");
                     return;
@@ -273,12 +248,11 @@ public class ExtractMain extends JFrame {
                 }
 
                 final BufferedReader reader = new BufferedReader(new StringReader(fileListFrame.getFileList()));
-                //final String rootPath = rootDirCs.getSelectedFile().getPath();
-                final String rootPath = sourcePathConfMap.get((String) rootDirCombo.getSelectedItem());
+                final String projectPath = getProjectPath();
                 final String targetPath = targetDirCs.getSelectedFile().getPath();
 
                 jta.setText("================== EXTRACT INFORMATION ==================\n");
-                jta.append("프로젝트경로 : " + rootPath + "\n");
+                jta.append("프로젝트경로 : " + projectPath + "\n");
                 jta.append("추출경로 : " + targetPath + "\n");
                 jta.append("파일목록 :\n");
                 jta.append(fileListFrame.getFileList() + "\n");
@@ -288,7 +262,7 @@ public class ExtractMain extends JFrame {
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
-                        ExtractResult extract = extractTemplate.extract(rootPath, targetPath, reader, jta);
+                        ExtractResult extract = extractTemplate.extract(projectPath, targetPath, reader, jta);
                         if(extract.getErrorMsg() != null) {
                             JOptionPane.showMessageDialog(null, extract.getErrorMsg());
                         } else {
@@ -302,27 +276,13 @@ public class ExtractMain extends JFrame {
                 thread.start();
             }
         });
-
     }
 
-    // 소스경로 설정파일 맵으로 셋팅
-    public Map<String, String> getSourcePathConfMap() {
-        Map<String, String> sourcePathConfMap = new LinkedHashMap<>();
-
-        Map<String, Object> jsonObj = FileUtil.getJsonObjByConfigJsonFile();
-        java.util.List<String> sourcePathList = (java.util.List<String>) jsonObj.get("sourcePathList");
-        if(sourcePathList == null) return sourcePathConfMap;
-
-        for(int i = 0; i < sourcePathList.size(); i++) {
-            String pathStr = sourcePathList.get(i);
-            if(pathStr != null && !"".equals(pathStr) && pathStr.length() > 1) {
-                String[] pathStrs = pathStr.split(">");
-                if(pathStrs.length == 2) {
-                    sourcePathConfMap.put(pathStrs[0], pathStrs[1]);
-                }
-            }
+    public String getProjectPath() {
+        if (sourcePathConfMap == null ||  rootDirCombo == null) {
+            return null;
         }
-        return sourcePathConfMap;
+        return sourcePathConfMap.get((String) rootDirCombo.getSelectedItem());
     }
 
     public void setSourceRootDirCombo() {
@@ -332,7 +292,7 @@ public class ExtractMain extends JFrame {
         rootDirCombo.removeAllItems();
         rootDirCombo.addItem("프로젝트 선택");
 
-        sourcePathConfMap = getSourcePathConfMap();
+        sourcePathConfMap = FileUtil.getSourcePathConfMap();
         //rootDirCombo = new JComboBox<>(sourcePathConfMap.keySet().toArray(new String[0]));
 
         Set<String> sourcePathKeySet = sourcePathConfMap.keySet();
@@ -354,14 +314,4 @@ public class ExtractMain extends JFrame {
         targetDirCs.setSelectedFile(extractDir);
         targetDirCs.setCurrentDirectory(extractDir);
     }
-
-    public static void main(String[] args) {
-        new ExtractMain();
-        /*java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ExtractMain();
-            }
-        });*/
-    }
-
 }

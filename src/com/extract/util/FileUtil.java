@@ -208,4 +208,24 @@ public class FileUtil {
         }
     }
 
+    // 프로젝트 경로 설정파일 맵으로 셋팅
+    public static Map<String, String> getSourcePathConfMap() {
+        Map<String, String> sourcePathConfMap = new LinkedHashMap<>();
+
+        Map<String, Object> jsonObj = getJsonObjByConfigJsonFile();
+        java.util.List<String> sourcePathList = (java.util.List<String>) jsonObj.get("sourcePathList");
+        if(sourcePathList == null) return sourcePathConfMap;
+
+        for(int i = 0; i < sourcePathList.size(); i++) {
+            String pathStr = sourcePathList.get(i);
+            if(pathStr != null && !"".equals(pathStr) && pathStr.length() > 1) {
+                String[] pathStrs = pathStr.split(">");
+                if(pathStrs.length == 2) {
+                    sourcePathConfMap.put(pathStrs[0], pathStrs[1]);
+                }
+            }
+        }
+        return sourcePathConfMap;
+    }
+
 }
