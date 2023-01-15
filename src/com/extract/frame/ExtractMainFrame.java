@@ -9,6 +9,7 @@ import com.extract.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -202,6 +203,7 @@ public class ExtractMainFrame extends JFrame {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Object item = e.getItem(); // 선택한 아이템
                     fileListFrame = null;
+                    setOffColorFileListBtn();
                 }
             }
         });
@@ -221,12 +223,19 @@ public class ExtractMainFrame extends JFrame {
         fileListBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // 프로젝트 선택된 경우만 실행
+                if (rootDirCombo.getSelectedIndex() < 1) {
+                    JOptionPane.showMessageDialog(null, "프로젝트를 선택해주세요.");
+                    return;
+                }
+
                 if(fileListFrame == null) {
                     //fileListFrame = new RegisterFileListFrame();
                     fileListFrame = new RegisterGitFileListFrame(ExtractMainFrame.this);
                 } else {
                     fileListFrame.showFrameInit();
                 }
+                setEnabled(false);
             }
         });
 
@@ -279,6 +288,10 @@ public class ExtractMainFrame extends JFrame {
         });
     }
 
+    public String getProjectName() {
+        return StringUtils.isNullToString(rootDirCombo.getSelectedItem());
+    }
+
     public String getProjectPath() {
         if (sourcePathConfMap == null ||  rootDirCombo == null) {
             return null;
@@ -314,5 +327,15 @@ public class ExtractMainFrame extends JFrame {
         }
         targetDirCs.setSelectedFile(extractDir);
         targetDirCs.setCurrentDirectory(extractDir);
+    }
+
+    public void setOnColorFileListBtn() {
+        this.fileListBtn.setBackground(new Color(76, 175, 80));
+        this.fileListBtn.setForeground(Color.WHITE);
+    }
+
+    public void setOffColorFileListBtn() {
+        this.fileListBtn.setBackground(Color.WHITE);
+        this.fileListBtn.setForeground(Color.BLACK);
     }
 }

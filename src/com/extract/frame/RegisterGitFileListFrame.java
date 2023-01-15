@@ -23,30 +23,32 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
     private ExtractMainFrame extractMainFrame;
     private GitUtil gitUtil;
     private String currentGitBranch;
-    private Integer gitFileListCount;
+    private int gitFileListCount;
 
     public RegisterGitFileListFrame(ExtractMainFrame extractMainFrame) {
         super("파일목록 등록");
 
         this.gitUtil = new GitUtil(new CmdUtil());
         this.extractMainFrame = extractMainFrame;
-        this.extractMainFrame.setEnabled(false);
 
         gitInit();
-        init();
+        layoutInit();
         eventInit();
     }
 
     private void gitInit() {
+        // 깃 설치 여부 확인
         if (!this.gitUtil.isInstalledGit()) return;
 
         String projectPath = this.extractMainFrame.getProjectPath();
         if (StringUtils.isEmpty(projectPath)) return;
 
+        // 현재 브랜치 확인
         String currentBranch = this.gitUtil.getCurrentBranch(projectPath);
         if (StringUtils.isEmpty(currentBranch)) return;
         this.currentGitBranch = currentBranch;
 
+        // 원격 master 존재 여부 확인
         if (!this.gitUtil.isExistOriginMaster(projectPath)) return;
 
         String fileList = this.gitUtil.getFileListByDiffOriginMaster(projectPath);
@@ -56,48 +58,58 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
         this.gitFileListCount = split.length;
     }
 
-    public void init() {
-        resetFileListBtn = new RoundedButton("RESET");
-        resetFileListBtn.setBackground(Color.darkGray);
-        resetFileListBtn.setForeground(Color.WHITE);
+    public void layoutInit() {
+        String projectName = this.extractMainFrame.getProjectName();
 
-        String gitDiffBtnTitle = "변경파일";
-        gitDiffBtnTitle = this.currentGitBranch != null ? this.currentGitBranch + " " + gitDiffBtnTitle : gitDiffBtnTitle;
-        gitDiffBtnTitle = this.gitFileListCount != null ? gitDiffBtnTitle + "(" + this.gitFileListCount + ")" : gitDiffBtnTitle;
+        JPanel projectInfoPanel = new JPanel();
+        projectInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        projectInfoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        projectInfoPanel.add(new JLabel("<html><b>프로젝트 : " + projectName + "<b>"));
+
+        String currentBranch = StringUtils.isEmpty(this.currentGitBranch) ? "찾을 수 없습니다." : this.currentGitBranch;
+        JPanel gitInfoPanel = new JPanel();
+        gitInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        gitInfoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        gitInfoPanel.add(new JLabel("<html><b>현재 브랜치 : " + currentBranch + "<b>"));
+
+        String gitDiffBtnTitle = "변경파일 가져오기" + "(" + this.gitFileListCount + ")";
         gitDiffBtn = new RoundedButton(gitDiffBtnTitle);
-        gitDiffBtn.setBackground(Color.darkGray);
+        gitDiffBtn.setBackground(new Color(255, 152, 0));
         gitDiffBtn.setForeground(Color.WHITE);
+        gitDiffBtn.setPreferredSize(new Dimension(150, 21));
 
-        JPanel topPanal = new JPanel();
-        topPanal.setLayout(new FlowLayout(FlowLayout.LEFT));
-        topPanal.setBorder(BorderFactory.createEmptyBorder(0, -5, 0, 0));
-        topPanal.add(resetFileListBtn);
-        topPanal.add(gitDiffBtn);
+        if (!StringUtils.isEmpty(this.currentGitBranch)) {
+            gitInfoPanel.add(gitDiffBtn);
+        }
 
         jta = new JTextArea();
         jsp = new JScrollPane(jta);
-        jsp.setPreferredSize(new Dimension(0, 400));
 
         JPanel jtaPanel = new JPanel();
-        jtaPanel.setLayout(new BoxLayout(jtaPanel, BoxLayout.X_AXIS));
-        jtaPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jtaPanel.add(jsp);
+        jtaPanel.setLayout(new BorderLayout());
+        jtaPanel.add(jsp, BorderLayout.CENTER);
+
+        resetFileListBtn = new RoundedButton("삭제");
+        resetFileListBtn.setBackground(Color.darkGray);
+        resetFileListBtn.setForeground(Color.WHITE);
 
         registerBtn = new RoundedButton("등록");
         registerBtn.setBackground(new Color(52, 73, 94));
         registerBtn.setForeground(Color.WHITE);
 
-        JPanel bottomPanal = new JPanel();
-        bottomPanal.setLayout(new BoxLayout(bottomPanal, BoxLayout.X_AXIS));
-        bottomPanal.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        bottomPanal.add(registerBtn);
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        bottomPanel.add(resetFileListBtn);
+        bottomPanel.add(registerBtn);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        panel.add(topPanal);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(projectInfoPanel);
+        panel.add(gitInfoPanel);
         panel.add(jtaPanel);
-        panel.add(bottomPanal);
+        panel.add(bottomPanel);
 
         this.add(panel);
         this.setSize(600, 450);
@@ -111,6 +123,7 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
             @Override
             public void windowClosing(WindowEvent e) {
                 extractMainFrame.setEnabled(true);
+                setColorExtractMainFrameFileListBtn();
                 super.windowClosing(e);
             }
         });
@@ -121,6 +134,7 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
             public void actionPerformed(ActionEvent e) {
                 extractMainFrame.setEnabled(true);
                 fileList = jta.getText();
+                setColorExtractMainFrameFileListBtn();
                 dispose();
             }
         });
@@ -131,6 +145,7 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
             public void actionPerformed(ActionEvent e) {
                 removeFileList();
                 jta.requestFocus();
+                setColorExtractMainFrameFileListBtn();
             }
         });
 
@@ -167,7 +182,15 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
             return;
         }
 
-        this.jta.append(this.gitUtil.getFileListByDiffOriginMaster(projectPath));
+        this.jta.setText(this.gitUtil.getFileListByDiffOriginMaster(projectPath));
+    }
+
+    private void setColorExtractMainFrameFileListBtn() {
+        if (StringUtils.isEmpty(this.fileList)) {
+            this.extractMainFrame.setOffColorFileListBtn();
+        } else {
+            this.extractMainFrame.setOnColorFileListBtn();
+        }
     }
 
     @Override
@@ -191,6 +214,7 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
 
     @Override
     public void showFrameInit() {
+        gitInit();
         this.jta.setText(this.fileList);
         this.setVisible(true);
     }
