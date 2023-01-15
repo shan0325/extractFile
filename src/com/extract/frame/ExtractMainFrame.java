@@ -39,9 +39,8 @@ public class ExtractMainFrame extends JFrame {
     private JMenuItem outPathConfMenu;
     private JMenuItem readme;
     private JMenuItem exitMenu;
-
+    private String fileList;
     private Map<String, String> sourcePathConfMap;
-
     private ExtractTemplate extractTemplate;
 
     public ExtractMainFrame() {
@@ -202,8 +201,7 @@ public class ExtractMainFrame extends JFrame {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Object item = e.getItem(); // 선택한 아이템
-                    fileListFrame = null;
-                    setOffColorFileListBtn();
+                    projectChangeInit();
                 }
             }
         });
@@ -229,12 +227,9 @@ public class ExtractMainFrame extends JFrame {
                     return;
                 }
 
-                if(fileListFrame == null) {
-                    //fileListFrame = new RegisterFileListFrame();
-                    fileListFrame = new RegisterGitFileListFrame(ExtractMainFrame.this);
-                } else {
-                    fileListFrame.showFrameInit();
-                }
+                //fileListFrame = new RegisterFileListFrame();
+                fileListFrame = new RegisterGitFileListFrame(ExtractMainFrame.this);
+                fileListFrame.setFileListJtaText(fileList);
                 setEnabled(false);
             }
         });
@@ -252,22 +247,16 @@ public class ExtractMainFrame extends JFrame {
                 } else if(targetDirCs.getSelectedFile() == null) {
                     JOptionPane.showMessageDialog(null, "추출경로를 선택해주세요.");
                     return;
-                } else if(fileListFrame == null || !fileListFrame.isExistFileList()) {
+                } else if(fileListFrame == null || StringUtils.isEmpty(fileList)) {
                     JOptionPane.showMessageDialog(null, "파일목록을 등록해주세요.");
                     return;
                 }
 
-                final BufferedReader reader = new BufferedReader(new StringReader(fileListFrame.getFileList()));
+                final BufferedReader reader = new BufferedReader(new StringReader(fileList));
                 final String projectPath = getProjectPath();
                 final String targetPath = targetDirCs.getSelectedFile().getPath();
 
-                jta.setText("================== EXTRACT INFORMATION ==================\n");
-                jta.append("프로젝트경로 : " + projectPath + "\n");
-                jta.append("추출경로 : " + targetPath + "\n");
-                jta.append("파일목록 :\n");
-                jta.append(fileListFrame.getFileList() + "\n");
-                jta.append("==========================================================\n\n");
-                jta.append(DateUtil.getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + " : START EXTRACTING FILES\n");
+                printExtractInformation(projectPath, targetPath);
 
                 Thread thread = new Thread() {
                     @Override
@@ -286,6 +275,23 @@ public class ExtractMainFrame extends JFrame {
                 thread.start();
             }
         });
+    }
+
+    // 프로젝트 선택 변경 시 초기화 진행
+    private void projectChangeInit() {
+        this.fileList = "";
+        setOffColorFileListBtn();
+        this.jta.setText("");
+    }
+
+    private void printExtractInformation(String projectPath, String targetPath) {
+        jta.setText("================== EXTRACT INFORMATION ==================\n");
+        jta.append("프로젝트경로 : " + projectPath + "\n");
+        jta.append("추출경로 : " + targetPath + "\n");
+        jta.append("파일목록 :\n");
+        jta.append(this.fileList + "\n");
+        jta.append("==========================================================\n\n");
+        jta.append(DateUtil.getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + " : START EXTRACTING FILES\n");
     }
 
     public String getProjectName() {
@@ -337,5 +343,17 @@ public class ExtractMainFrame extends JFrame {
     public void setOffColorFileListBtn() {
         this.fileListBtn.setBackground(Color.WHITE);
         this.fileListBtn.setForeground(Color.BLACK);
+    }
+
+    public void setFileList(String fileList) {
+        this.fileList = fileList;
+    }
+
+    public void setColorExtractMainFrameFileListBtn() {
+        if (StringUtils.isEmpty(this.fileList)) {
+            setOffColorFileListBtn();
+        } else {
+            setOnColorFileListBtn();
+        }
     }
 }

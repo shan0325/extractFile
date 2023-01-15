@@ -3,7 +3,6 @@ package com.extract.frame;
 import com.extract.util.StringUtils;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -64,20 +63,8 @@ public class RegisterFileListFrame extends JFrame implements RegisterFileList {
     }
 
     @Override
-    public String getFileList() {
-        return jta.getText();
-    }
-
-    @Override
-    public boolean isExistFileList() {
-        if("".equals(jta.getText().trim())) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void showFrameInit() {
-        this.setVisible(true);
+    public void setFileListJtaText(String fileList) {
+        if (StringUtils.isEmpty(fileList)) return;
+        this.jta.setText(fileList);
     }
 }

@@ -17,7 +17,6 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
     private JButton registerBtn;
     private JTextArea jta;
     private JScrollPane jsp;
-    private String fileList;
     private JButton gitDiffBtn;
     private JButton resetFileListBtn;
     private ExtractMainFrame extractMainFrame;
@@ -60,17 +59,16 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
 
     public void layoutInit() {
         String projectName = this.extractMainFrame.getProjectName();
+        String currentBranch = StringUtils.isEmpty(this.currentGitBranch) ? "찾을 수 없습니다." : this.currentGitBranch;
 
         JPanel projectInfoPanel = new JPanel();
-        projectInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        projectInfoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        projectInfoPanel.add(new JLabel("<html><b>프로젝트 : " + projectName + "<b>"));
+        projectInfoPanel.setLayout(new GridLayout(1, 2));
+        projectInfoPanel.add(new JLabel("<html><b>Project - " + projectName + "<b>"));
+        projectInfoPanel.add(new JLabel("<html><b>Branch - " + currentBranch + "<b>"));
 
-        String currentBranch = StringUtils.isEmpty(this.currentGitBranch) ? "찾을 수 없습니다." : this.currentGitBranch;
         JPanel gitInfoPanel = new JPanel();
-        gitInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        gitInfoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        gitInfoPanel.add(new JLabel("<html><b>현재 브랜치 : " + currentBranch + "<b>"));
+        gitInfoPanel.setLayout(new GridLayout(1, 1));
+        gitInfoPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         String gitDiffBtnTitle = "변경파일 가져오기" + "(" + this.gitFileListCount + ")";
         gitDiffBtn = new RoundedButton(gitDiffBtnTitle);
@@ -123,7 +121,7 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
             @Override
             public void windowClosing(WindowEvent e) {
                 extractMainFrame.setEnabled(true);
-                setColorExtractMainFrameFileListBtn();
+                extractMainFrame.setColorExtractMainFrameFileListBtn();
                 super.windowClosing(e);
             }
         });
@@ -133,8 +131,8 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
             @Override
             public void actionPerformed(ActionEvent e) {
                 extractMainFrame.setEnabled(true);
-                fileList = jta.getText();
-                setColorExtractMainFrameFileListBtn();
+                extractMainFrame.setFileList(jta.getText());
+                extractMainFrame.setColorExtractMainFrameFileListBtn();
                 dispose();
             }
         });
@@ -145,7 +143,7 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
             public void actionPerformed(ActionEvent e) {
                 removeFileList();
                 jta.requestFocus();
-                setColorExtractMainFrameFileListBtn();
+                extractMainFrame.setColorExtractMainFrameFileListBtn();
             }
         });
 
@@ -185,37 +183,15 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
         this.jta.setText(this.gitUtil.getFileListByDiffOriginMaster(projectPath));
     }
 
-    private void setColorExtractMainFrameFileListBtn() {
-        if (StringUtils.isEmpty(this.fileList)) {
-            this.extractMainFrame.setOffColorFileListBtn();
-        } else {
-            this.extractMainFrame.setOnColorFileListBtn();
-        }
-    }
-
     @Override
     public void removeFileList() {
         this.jta.setText("");
-        this.fileList = "";
+        extractMainFrame.setFileList("");
     }
 
     @Override
-    public String getFileList() {
-        return this.fileList;
-    }
-
-    @Override
-    public boolean isExistFileList() {
-        if(StringUtils.isEmpty(this.fileList) || "".equals(this.fileList.trim())) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void showFrameInit() {
-        gitInit();
-        this.jta.setText(this.fileList);
-        this.setVisible(true);
+    public void setFileListJtaText(String fileList) {
+        if (StringUtils.isEmpty(fileList)) return;
+        this.jta.setText(fileList);
     }
 }
