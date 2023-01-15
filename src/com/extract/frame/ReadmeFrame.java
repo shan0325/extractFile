@@ -17,7 +17,7 @@ public class ReadmeFrame extends JFrame {
         info.setForeground(Color.RED);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(8, 1));
+        panel.setLayout(new GridLayout(9, 1));
 //        panel.setBorder(BorderFactory.createEtchedBorder());
         panel.add(new JLabel(""));
         panel.add(info);
@@ -27,6 +27,7 @@ public class ReadmeFrame extends JFrame {
         panel.add(new JLabel("추출경로 : 소스를 다운 받을 디렉토리 선택"));
         panel.add(new JLabel(""));
         panel.add(new JLabel("파일목록 : 추출할 소스 파일 목록 등록(ex src/main/java/.../DateUtil.java)"));
+        panel.add(new JLabel("  - 변경파일 가져오기 버튼 : 현재 브랜치를 원격 master와 비교하여 수정 및 추가된 파일을 가져온다."));
 
         this.setLayout(new FlowLayout(FlowLayout.LEFT));
         this.add(panel);

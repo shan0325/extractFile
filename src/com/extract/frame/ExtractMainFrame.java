@@ -21,7 +21,7 @@ import java.util.*;
 
 public class ExtractMainFrame extends JFrame {
 
-    private static final String VERSION = "1.1.1";
+    private static final String VERSION = "1.2.0";
 
     private JComboBox<String> rootDirCombo;
     private JFileChooser rootDirCs;
@@ -239,7 +239,7 @@ public class ExtractMainFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(rootDirCombo.getItemCount() == 1) {
-                    JOptionPane.showMessageDialog(null, "프로젝트경로를 설정해주세요.");
+                    JOptionPane.showMessageDialog(null, "설정에서 프로젝트경로를 등록해주세요.");
                     return;
                 } else if(rootDirCombo.getSelectedIndex() < 1) {
                     JOptionPane.showMessageDialog(null, "프로젝트를 선택해주세요.");
