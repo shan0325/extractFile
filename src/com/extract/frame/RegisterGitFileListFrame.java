@@ -113,6 +113,7 @@ public class RegisterGitFileListFrame extends JFrame implements RegisterFileList
         this.setSize(600, 450);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+        this.setIconImage(new ImageIcon(getClass().getResource("/icon/crocodile.png")).getImage()); // 아이콘
     }
 
     private void eventInit() {
