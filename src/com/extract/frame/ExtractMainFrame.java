@@ -244,7 +244,7 @@ public class ExtractMainFrame extends JFrame {
                 } else if(rootDirCombo.getSelectedIndex() < 1) {
                     JOptionPane.showMessageDialog(null, "프로젝트를 선택해주세요.");
                     return;
-                } else if(targetDirCs.getSelectedFile() == null) {
+                } else if(targetDirCs.getSelectedFile() == null && targetDirCs.getCurrentDirectory() == null) {
                     JOptionPane.showMessageDialog(null, "추출경로를 선택해주세요.");
                     return;
                 } else if(fileListFrame == null || StringUtils.isEmpty(fileList)) {
@@ -254,7 +254,7 @@ public class ExtractMainFrame extends JFrame {
 
                 final BufferedReader reader = new BufferedReader(new StringReader(fileList));
                 final String projectPath = getProjectPath();
-                final String targetPath = targetDirCs.getSelectedFile().getPath();
+                final String targetPath = targetDirCs.getCurrentDirectory().getPath();
 
                 printExtractInformation(projectPath, targetPath);
 

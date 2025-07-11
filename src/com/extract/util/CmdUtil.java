@@ -12,7 +12,14 @@ public class CmdUtil {
         Process process = null;
         BufferedReader reader = null;
         try {
-            process = Runtime.getRuntime().exec("cmd /c " + cmd);
+
+            // macOS 확인
+            if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                process = new ProcessBuilder("bash", "-c", cmd).start();
+            } else if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                process = Runtime.getRuntime().exec("cmd /c " + cmd);
+            }
+
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = null;
             StringBuffer sb = new StringBuffer();
